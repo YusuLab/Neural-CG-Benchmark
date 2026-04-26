@@ -1,15 +1,13 @@
 task:
   type: HausdorffDistanceTask
-  dataset: ModelNetPointset
+  dataset: SQUIDBoundaries
   dataset_config:
-    name: '10'
-    size: 256
-    length: 200
-  ood_dataset: ModelNetPointset
+    length: 100
+    normalization: true
+  ood_dataset: SQUIDBoundaries
   ood_config:
-    name: '10'
-    size: 512
-    length: 200
+    length: 10
+    normalization: true
 backbone:
   type: CoupledNetwork
   latent_dimension: 32
@@ -19,10 +17,15 @@ backbone:
   use_siamese: false
   aggregation: sum
   encoder:
-    type: SetNN
-    d_model: 64
-    embedding_layers: 2
-    embedding_hidden_dim: 128
+    type: Sumformer
+    n_heads: 2
+    n_layers: 2
+    d_model: 128
+    key_dim: 512
+    feed_forward_hidden_dim: 128
+  decoder:
+    decoder_hidden_dim: 256
+    decoder_n_layers: 3
 batch_size: 128
 learning_rate: 0.0001
 debug_mode: true

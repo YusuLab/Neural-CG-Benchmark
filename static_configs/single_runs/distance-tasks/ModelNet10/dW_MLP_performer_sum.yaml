@@ -1,19 +1,15 @@
 task:
-  type: FrechetDistanceTask
-  dataset: RandomTrajectory
+  type: WassersteinDistanceTask
+  dataset: ModelNetPointset
   dataset_config:
-    length: 100
-    min_points: 10
-    max_points: 20
-    type: Langevin
-    scaling: 10
-  ood_dataset: RandomTrajectory
+    name: '10'
+    size: 256
+    length: 200
+  ood_dataset: ModelNetPointset
   ood_config:
-    length: 10
-    min_points: 15
-    max_points: 25
-    type: Langevin
-    scaling: 10
+    name: '10'
+    size: 512
+    length: 200
 backbone:
   type: CoupledNetwork
   latent_dimension: 32
@@ -23,10 +19,11 @@ backbone:
   use_siamese: false
   aggregation: sum
   encoder:
-    type: SetNN
+    type: Performer
+    n_heads: 2
+    n_layers: 3
     d_model: 64
-    embedding_layers: 2
-    embedding_hidden_dim: 128
+    feed_forward_hidden_dim: 128
   positional_encoding: SinusoidalAbsolutePositionalEncoding
 batch_size: 128
 learning_rate: 0.0001

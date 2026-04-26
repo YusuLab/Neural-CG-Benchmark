@@ -1,7 +1,8 @@
 task:
-  type: WassersteinDistanceTask
+  type: HausdorffDistanceTask
   dataset: SQUIDBoundaries
   dataset_config:
+    length: 10
     normalization: True
   ood_dataset: GaussianBlobs
   ood_config:
@@ -13,20 +14,19 @@ backbone:
   type: CoupledNetwork
   latent_dimension: 32
   p: 1
-  reconstruct_input: False
+  reconstruct_input: false
   decoder_distance: SinkhornLoss
-  use_siamese: False
-  encoder: 
-    type: Transformer
-    n_heads: 2
-    n_layers: 2
-    d_model: 128
-    key_dim: 512
-    feed_forward_hidden_dim: 128
+  use_siamese: false
+  aggregation: sum
+  encoder:
+    type: SetNN
+    d_model: 64
+    embedding_layers: 2
+    embedding_hidden_dim: 128
   decoder:
     decoder_hidden_dim: 256
-    decoder_n_layers: 2
+    decoder_n_layers: 3
 batch_size: 128
-learning_rate: 1.e-4
-debug_mode: True
+learning_rate: 0.0001
+debug_mode: true
 loss_function: mse_loss

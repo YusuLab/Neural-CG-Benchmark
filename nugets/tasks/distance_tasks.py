@@ -15,6 +15,7 @@ from nugets.datasets.datapoint_types import DistanceDatapoint
 
 from shapely import LineString
 from shapely import frechet_distance
+from dtaidistance.dtw_ndim import distance as dtw_distance
 
 from .task import Task
 from .register import register
@@ -144,3 +145,15 @@ class FrechetDistanceTask(DistanceTask):
         curve1 = LineString(set1)
         curve2 = LineString(set2)
         return frechet_distance(curve1, curve2) 
+
+@register
+class DynamicTimeWarpingDistanceTask(DistanceTask):
+    """
+    Suppose we are given two sequences on points which we can represent 
+    as ordered sets. 
+
+    This class computes the dynamic time warping distance between these sets.
+    """
+
+    def distance(self, set1, set2):
+        return dtw_distance(set1, set2)

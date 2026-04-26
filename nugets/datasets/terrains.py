@@ -8,6 +8,8 @@ from ml_lib.datasets.splitting import SplitTransform
 from .dataset_utils import download_from_url, extract_data_from_zip, extract_nested_zips
 from nugets.datasets.datapoint_types import Set_datapoint
 from nugets.datasets.register import register as dataset_register
+import numpy as np
+import torch
 
 # TODO: Dataset download slow right now on the server: we should make the construction
 #       faster. I am not sure if this is due to the rasterio file opening that happens?
@@ -70,7 +72,6 @@ class NZDEM(Dataset[Set_datapoint]):
         Download data and extract zip files
         """
         import rasterio
-        import numpy as np
         from tqdm import tqdm
 
         rng = np.random.default_rng(self.seed)

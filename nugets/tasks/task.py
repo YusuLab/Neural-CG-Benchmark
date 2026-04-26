@@ -208,7 +208,6 @@ class Task():
         """Get the dataloader"""
         from torch.utils.data import DataLoader
         dataset = self.get_dataset(which)
-        print(f'{which} dataset size:', len(dataset))
         config = Config.get()
         if config.multi_epoch_data_loader:
             data_loader = MultiEpochDataLoader

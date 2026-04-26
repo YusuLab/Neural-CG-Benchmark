@@ -1,32 +1,27 @@
 task:
-  type: FrechetDistanceTask
-  dataset: RandomTrajectory
+  type: HausdorffDistanceTask
+  dataset: SQUIDBoundaries
   dataset_config:
     length: 100
-    min_points: 10
-    max_points: 20
-    type: Langevin
-    scaling: 10
-  ood_dataset: RandomTrajectory
+    normalization: true
+  ood_dataset: SQUIDBoundaries
   ood_config:
     length: 10
-    min_points: 15
-    max_points: 25
-    type: Langevin
-    scaling: 10
+    normalization: true
 backbone:
   type: CoupledNetwork
   latent_dimension: 32
   p: 1
   reconstruct_input: false
   decoder_distance: SinkhornLoss
-  use_siamese: false
-  aggregation: max
+  use_siamese: true
+  aggregation: sum
   encoder:
-    type: SetNN
+    type: Performer
+    n_heads: 2
+    n_layers: 3
     d_model: 64
-    embedding_layers: 2
-    embedding_hidden_dim: 128
+    feed_forward_hidden_dim: 128
   positional_encoding: SinusoidalAbsolutePositionalEncoding
 batch_size: 128
 learning_rate: 0.0001

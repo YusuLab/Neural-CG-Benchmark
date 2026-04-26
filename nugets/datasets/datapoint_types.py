@@ -11,17 +11,10 @@ from torch_heterogeneous_batching.batch import Batch
 @dataclass
 class Set_datapoint(Datapoint):
     pointset: torch.Tensor
-    rpe = None # parameter used to store information about rleative positional encodings
-
     @classmethod
     def collate(cls, points):
         input_sets = [p.pointset for p in points]
         set_batch = Batch.from_list(input_sets, order=1)
-        if self.rpe == None: 
-            return Set_batch(pointset=set_batch)
-        # input_rpes = [p.rpe for p in points]
-        # rpe_batch = Batch.from_list(input_rpes, order=1)
-        # return Set_batch(pointset=set_batch, rpe=rpe_batch)
 
 @dataclass
 class Set_batch(Datapoint):

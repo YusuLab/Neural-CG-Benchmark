@@ -23,10 +23,11 @@ backbone:
   use_siamese: false
   aggregation: max
   encoder:
-    type: SetNN
+    type: Performer
+    n_heads: 2
+    n_layers: 3
     d_model: 64
-    embedding_layers: 2
-    embedding_hidden_dim: 128
+    feed_forward_hidden_dim: 128
   positional_encoding: SinusoidalAbsolutePositionalEncoding
 batch_size: 128
 learning_rate: 0.0001
