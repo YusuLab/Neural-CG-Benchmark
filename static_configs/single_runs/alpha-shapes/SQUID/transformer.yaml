@@ -1,5 +1,5 @@
 task:
-  type: ConvexHullMembershipTask
+  type: AlphaShape2MembershipTask
   dataset: SQUIDBoundaries
   dataset_config:
     normalization: True
