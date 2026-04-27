@@ -52,7 +52,7 @@ class ModelNetPointset(Dataset[Set_datapoint]):
     seed: int = 42
     
     def __init__(self, name: Literal["10", "40"], 
-                 split_seed=42, size=1024, length=200, which='train'):
+                 split_seed=42, size=1024, length=None, which='train'):
         root_dir=Path('workdir/datasets/raw')
         root_dir.mkdir(exist_ok=True, parents=True)
         is_train_or_val = which in ("train", "val")
@@ -68,22 +68,25 @@ class ModelNetPointset(Dataset[Set_datapoint]):
         inner: Pyg_ModelNet|SplitTransform = Pyg_ModelNet(root=str(root_dir), 
                              train=is_train, 
                              name=name, transform=SamplePoints(num=size))
-        if is_train:
-            class_to_indices = defaultdict(list)
-            for i in range(len(inner)):
-                y = int(inner[i].y.item())
-                class_to_indices[y].append(i)
-            selected_indices = []
-            for y in class_to_indices:
-                idxs = class_to_indices[y]
-                sampled_idxs = rng.choice(idxs, size=samples_per_class, replace=False)
-                selected_indices.extend(sampled_idxs)
-        else:
-            num_selected = length//10
-            selected_indices = rng.choice(len(inner), size=num_selected, replace=False)
+        if length is not None: 
+            if is_train:
+                class_to_indices = defaultdict(list)
+                for i in range(len(inner)):
+                    y = int(inner[i].y.item())
+                    class_to_indices[y].append(i)
+                selected_indices = []
+                for y in class_to_indices:
+                    idxs = class_to_indices[y]
+                    sampled_idxs = rng.choice(idxs, size=samples_per_class, replace=False)
+                    selected_indices.extend(sampled_idxs)
+            else:
+                num_selected = length//10
+                selected_indices = rng.choice(len(inner), size=num_selected, replace=False)
         
-        # Normalize
-        selected_pts = inner[selected_indices]
+            # Normalize
+            selected_pts = inner[selected_indices]
+        else:
+            selected_pts = inner
         self.inner = []
         for ptset in selected_pts:
             centered = ptset.pos - ptset.pos.mean(dim=0, keepdim=True)
