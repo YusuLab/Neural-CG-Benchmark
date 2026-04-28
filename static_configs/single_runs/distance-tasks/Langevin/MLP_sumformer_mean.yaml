@@ -1,5 +1,5 @@
 task:
-  type: FrechetDistanceTask
+  type: DynamicTimeWarpingDistanceTask
   dataset: RandomTrajectory
   dataset_config:
     length: 100

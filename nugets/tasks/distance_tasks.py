@@ -156,4 +156,4 @@ class DynamicTimeWarpingDistanceTask(DistanceTask):
     """
 
     def distance(self, set1, set2):
-        return dtw_distance(set1, set2)
+        return dtw_distance(set1.numpy(), set2.numpy())
