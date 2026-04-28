@@ -4,7 +4,7 @@ task:
   dataset_config:
     name: '10'
     size: 256
-  dataset: ModelNetPointset
+  ood_dataset: ModelNetPointset
   dataset_config:
     name: '10'
     size: 512
