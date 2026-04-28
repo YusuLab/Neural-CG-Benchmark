@@ -7,7 +7,7 @@ task:
   ood_config:
     normalization: True
 backbone:
-  type: Sumformer
+  type: Performer
   n_heads: 1
   n_layers: 3
   d_model: 16

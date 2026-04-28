@@ -9,7 +9,7 @@ task:
     name: '10'
     size: 512
 backbone:
-  type: Sumformer
+  type: Transformer
   n_heads: 1
   n_layers: 3
   d_model: 16
