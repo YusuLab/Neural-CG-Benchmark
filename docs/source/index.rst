@@ -11,6 +11,8 @@
 
    self
    running
+   dataset_inventory
+   server_local_datasets
    cloud_integration
 
 
@@ -24,4 +26,3 @@ Packages
    :template: custom-module-template.rst
    
    nugets
-
