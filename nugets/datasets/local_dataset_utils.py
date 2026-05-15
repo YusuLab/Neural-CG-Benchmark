@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Iterable
 import json
 import pickle
+import gzip
 
 import numpy as np
 import torch
@@ -83,4 +84,44 @@ def load_shortest_path_synthetic_graph(base_path: Path) -> Graph_datapoint:
         directed_edges.append((src_idx, dst_idx))
         directed_edges.append((dst_idx, src_idx))
     edges = torch.tensor(directed_edges, dtype=torch.int64).t().contiguous()
+    return Graph_datapoint(pointset=pointset, edges=edges)
+
+
+def load_dehnn_pyg_graph(path: Path) -> Graph_datapoint:
+    data = torch.load(path, map_location="cpu")
+    node_features = ensure_2d_float_tensor(getattr(data, "node_features"))
+    edges = ensure_edge_index_tensor(getattr(data, "edge_index_source_sink"))
+    return Graph_datapoint(pointset=node_features, edges=edges)
+
+
+def load_circuitnet_standardized_graph(path: Path) -> Graph_datapoint:
+    data = torch.load(path, map_location="cpu")
+    inst_features = ensure_2d_float_tensor(data["inst"].x)
+    edges = ensure_edge_index_tensor(data["inst", "to", "net"].edge_index)
+    return Graph_datapoint(pointset=inst_features, edges=edges)
+
+
+def load_pickle(path: Path):
+    if path.suffix == ".gz":
+        with gzip.open(path, "rb") as handle:
+            return pickle.load(handle)
+    with path.open("rb") as handle:
+        return pickle.load(handle)
+
+
+def load_superblue_processed_graph(node_feature_path: Path) -> Graph_datapoint:
+    suffix = ".node_features.pkl"
+    if not node_feature_path.name.endswith(suffix):
+        raise ValueError(f"Expected a Superblue node feature file, got {node_feature_path}")
+
+    design_prefix = node_feature_path.name[: -len(suffix)]
+    bipartite_path = node_feature_path.with_name(f"{design_prefix}.bipartite.pkl")
+    if not bipartite_path.exists():
+        raise FileNotFoundError(f"Superblue bipartite graph file does not exist: {bipartite_path}")
+
+    node_payload = load_pickle(node_feature_path)
+    bipartite_payload = load_pickle(bipartite_path)
+
+    pointset = ensure_2d_float_tensor(node_payload["instance_features"])
+    edges = ensure_edge_index_tensor(bipartite_payload["edge_index"])
     return Graph_datapoint(pointset=pointset, edges=edges)

@@ -14,6 +14,10 @@ def test_local_dataset_registry_contains_new_entries():
         "TreeGrid",
         "ShortestPathSynthetic",
         "ChipDiffusionPygGraph",
+        "DEHNNMLCADNetlistGraphs",
+        "DEHNNISPD16NetlistGraphs",
+        "CircuitNetStandardizedGraphs",
+        "SuperblueProcessedGraphs",
     ):
         assert name in register
 
@@ -58,3 +62,57 @@ def test_chipdiffusion_loader_shape():
     assert sample.pointset.ndim == 2
     assert sample.edges.ndim == 2
     assert sample.edges.shape[0] == 2
+
+
+def test_dehnn_loader_shapes_and_split():
+    register = get_dataset_register()
+    dataset_type = register["DEHNNMLCADNetlistGraphs"]
+    train = dataset_type(which="train", length=4, split_seed=7)
+    val = dataset_type(which="val", length=4, split_seed=7)
+
+    assert len(train) > 0
+    sample = train[0]
+    assert isinstance(sample, Graph_datapoint)
+    assert sample.pointset.ndim == 2
+    assert sample.edges.ndim == 2
+    assert sample.edges.shape[0] == 2
+
+    train_names = {path.name for path in train.paths}
+    val_names = {path.name for path in val.paths}
+    assert train_names.isdisjoint(val_names)
+
+
+def test_circuitnet_loader_shapes_and_split():
+    register = get_dataset_register()
+    dataset_type = register["CircuitNetStandardizedGraphs"]
+    train = dataset_type(which="train", length=4, split_seed=7)
+    val = dataset_type(which="val", length=4, split_seed=7)
+
+    assert len(train) > 0
+    sample = train[0]
+    assert isinstance(sample, Graph_datapoint)
+    assert sample.pointset.ndim == 2
+    assert sample.edges.ndim == 2
+    assert sample.edges.shape[0] == 2
+
+    train_names = {path.name for path in train.paths}
+    val_names = {path.name for path in val.paths}
+    assert train_names.isdisjoint(val_names)
+
+
+def test_superblue_loader_shapes_and_split():
+    register = get_dataset_register()
+    dataset_type = register["SuperblueProcessedGraphs"]
+    train = dataset_type(which="train", length=4, split_seed=7)
+    val = dataset_type(which="val", length=4, split_seed=7)
+
+    assert len(train) > 0
+    sample = train[0]
+    assert isinstance(sample, Graph_datapoint)
+    assert sample.pointset.ndim == 2
+    assert sample.edges.ndim == 2
+    assert sample.edges.shape[0] == 2
+
+    train_names = {path.name for path in train.paths}
+    val_names = {path.name for path in val.paths}
+    assert train_names.isdisjoint(val_names)

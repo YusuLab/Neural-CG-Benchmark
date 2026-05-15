@@ -3,6 +3,11 @@ wandb/
 docs/source/_autosummary
 .keys/
 config.yaml
+
+# AI tool artifacts (Claude Code, Cursor, Codex, etc.)
+.claude/
+local_dataset_state_summary.csv
+local_dataset_state_summary.md
 # Byte-compiled / optimized / DLL files
 workdir
 __pycache__/

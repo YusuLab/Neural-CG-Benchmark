@@ -53,12 +53,12 @@ LOCAL_DATASET_CATALOG: tuple[DatasetCatalogEntry, ...] = (
         ),
         formats=("pkl", "pkl.gz"),
         suggested_datapoint_type="Graph_datapoint",
-        status="cataloged_only",
+        status="loader_supported",
     ),
     DatasetCatalogEntry(
         name="DEHNN Netlist Dataset",
-        category="asic_physical_design",
-        domain_module="asic_physical_design",
+        category="asic_physical_design|fpga_physical_design",
+        domain_module="asic_physical_design|fpga_physical_design",
         description=(
             "Netlist and hypergraph data used by DE-HNN, derived from RocketTile "
             "and Superblue-style flows. Includes raw-to-processed graph builders, "
@@ -71,7 +71,7 @@ LOCAL_DATASET_CATALOG: tuple[DatasetCatalogEntry, ...] = (
         ),
         formats=("pt", "pkl", "npy", "csv"),
         suggested_datapoint_type="Graph_datapoint",
-        status="cataloged_only",
+        status="loader_supported",
     ),
     DatasetCatalogEntry(
         name="CircuitNet Design Graphs",
@@ -88,7 +88,7 @@ LOCAL_DATASET_CATALOG: tuple[DatasetCatalogEntry, ...] = (
         ),
         formats=("pt", "npy", "json"),
         suggested_datapoint_type="Graph_datapoint",
-        status="cataloged_only",
+        status="loader_supported",
     ),
     DatasetCatalogEntry(
         name="DREAMPlace ASIC Benchmarks",
