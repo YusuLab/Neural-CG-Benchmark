@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from pathlib import Path
 import re
@@ -65,9 +67,8 @@ LOCAL_DATASET_CATALOG: tuple[DatasetCatalogEntry, ...] = (
             "PyG datasets, embeddings, and netlist-level tensors."
         ),
         local_paths=(
-            "/data/zhishang/DEHNN/de_hnn/data",
-            "/data/zhishang/DEHNN/de_hnn_tx/data",
-            "/data/zhishang/DEHNN/de_hnn_tx",
+            "/data/zhishang/DEHNN/de_hnn_tx/data/mlcad/all_designs_netlist_data",
+            "/data/zhishang/DEHNN/de_hnn_tx/data/ispd/ispd16_netlist_data",
         ),
         formats=("pt", "pkl", "npy", "csv"),
         suggested_datapoint_type="Graph_datapoint",
@@ -83,8 +84,7 @@ LOCAL_DATASET_CATALOG: tuple[DatasetCatalogEntry, ...] = (
             "training/evaluation inputs for congestion and related tasks."
         ),
         local_paths=(
-            "/data/zhishang/CircuitNet/de_hnn_qm",
-            "/data/zhishang/CircuitNet/de_hnn_qm/verilog",
+            "/data/zhishang/CircuitNet/de_hnn_qm/new_data/processed_standardized",
         ),
         formats=("pt", "npy", "json"),
         suggested_datapoint_type="Graph_datapoint",

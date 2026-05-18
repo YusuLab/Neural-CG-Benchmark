@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import sys
 import tempfile
 from pathlib import Path
 
@@ -13,6 +14,8 @@ def load_research_catalog_module():
     if spec is None or spec.loader is None:
         raise SystemExit(f"Could not load research catalog module from {module_path}")
     module = importlib.util.module_from_spec(spec)
+    # Register before exec so dataclasses can resolve the module context on Python 3.8.
+    sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
 

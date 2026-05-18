@@ -23,12 +23,15 @@ class ChipDiffusionPygGraph(Dataset[Graph_datapoint]):
     def __init__(
         self,
         *,
-        root: str = "/data/zhishang/chipdiffusion/datasets/graph/pyg_graph.pt",
+        root: str = "data/server-local/chipdiffusion-graph-dataset/datasets/graph/pyg_graph.pt",
         which: str = "train",
     ):
         self.root = Path(root)
         if not self.root.exists():
-            raise FileNotFoundError(f"ChipDiffusion graph file does not exist: {self.root}")
+            raise FileNotFoundError(
+                f"ChipDiffusion graph file does not exist: {self.root}\n"
+                "Run: python download_research_datasets.py --entry chipdiffusion-graph-dataset"
+            )
         self.which = which
         data = torch.load(self.root, map_location="cpu")
         self.graph = graph_datapoint_from_pyg(data)
@@ -61,7 +64,10 @@ class _DEHNNDirectoryGraphDataset(Dataset[Graph_datapoint]):
     ):
         self.root = Path(root)
         if not self.root.exists():
-            raise FileNotFoundError(f"DE-HNN design root does not exist: {self.root}")
+            raise FileNotFoundError(
+                f"DE-HNN design root does not exist: {self.root}\n"
+                "Run: python download_research_datasets.py --entry dehnn-netlist-dataset"
+            )
         self.which = which
         self.split_seed = split_seed
         self.length = length
@@ -89,7 +95,7 @@ class DEHNNMLCADNetlistGraphs(_DEHNNDirectoryGraphDataset):
     def __init__(
         self,
         *,
-        root: str = "/data/zhishang/DEHNN/de_hnn_tx/data/mlcad/all_designs_netlist_data",
+        root: str = "data/server-local/dehnn-netlist-dataset/all_designs_netlist_data",
         **kwargs,
     ):
         super().__init__(root=root, **kwargs)
@@ -102,14 +108,17 @@ class CircuitNetStandardizedGraphs(Dataset[Graph_datapoint]):
     def __init__(
         self,
         *,
-        root: str = "/data/zhishang/CircuitNet/de_hnn_qm/new_data/processed_standardized",
+        root: str = "data/server-local/circuitnet-design-graphs/processed_standardized",
         which: str = "train",
         split_seed: int = 42,
         length: int | None = None,
     ):
         self.root = Path(root)
         if not self.root.exists():
-            raise FileNotFoundError(f"CircuitNet standardized root does not exist: {self.root}")
+            raise FileNotFoundError(
+                f"CircuitNet standardized root does not exist: {self.root}\n"
+                "Run: python download_research_datasets.py --entry circuitnet-design-graphs"
+            )
         self.which = which
         self.split_seed = split_seed
         self.length = length
@@ -138,14 +147,17 @@ class SuperblueProcessedGraphs(Dataset[Graph_datapoint]):
     def __init__(
         self,
         *,
-        root: str = "/data/zhishang/data/superblue/2023-03-06_data",
+        root: str = "data/server-local/superblue-processed-graph-features/2023-03-06_data",
         which: str = "train",
         split_seed: int = 42,
         length: int | None = None,
     ):
         self.root = Path(root)
         if not self.root.exists():
-            raise FileNotFoundError(f"Superblue processed root does not exist: {self.root}")
+            raise FileNotFoundError(
+                f"Superblue processed root does not exist: {self.root}\n"
+                "Run: python download_research_datasets.py --entry superblue-processed-graph-features"
+            )
         self.which = which
         self.split_seed = split_seed
         self.length = length

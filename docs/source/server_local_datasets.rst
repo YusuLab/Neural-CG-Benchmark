@@ -1,123 +1,162 @@
-Server-local datasets and Hugging Face export
-=============================================
+Datasets: download and server-local access
+==========================================
 
-How the benchmark currently works
----------------------------------
+Dataset availability
+--------------------
 
-The current NUGETS codebase assumes two different remote storage patterns:
+The benchmark datasets fall into two groups:
 
-1. Raw datasets are often fetched from the internet by dataset loaders and then
-   cached under ``workdir/datasets/raw``.
-2. Processed task datasets are cached as tar files under
-   ``workdir/datasets/processed`` and can optionally be downloaded from or
-   uploaded to GCS through :mod:`nugets.tasks.task`.
+**Available on Hugging Face** (``luckyjackluo/Neural-CG-Benchmark``):
 
-This is a reasonable fit for public datasets such as ModelNet, ShapeNet, or the
-terrain loaders, but it does not match the local research datasets in the shared
-server workspace. Those datasets already exist on disk under ``/data/zhishang``
-and should be treated as canonical local sources rather than something the
-benchmark downloads itself.
+.. list-table::
+   :header-rows: 1
+   :widths: 38 40 22
 
-What changed
-------------
+   * - Entry slug
+     - Description
+     - Loaders
+   * - ``chipdiffusion-graph-dataset``
+     - ChipDiffusion ASIC graph (PyG format)
+     - ``ChipDiffusionPygGraph``
+   * - ``shortest-paths-terrain-patches``
+     - Terrain shortest-path patches (Norway, Holland, Phil)
+     - ``NorwayTerrainPatches``, ``HollandTerrainPatches``, ``PhilTerrainPatches``
+   * - ``synthetic-graph-benchmarks``
+     - Synthetic graph reasoning benchmarks (BA-shapes, tree-cycles, etc.)
+     - ``BAShapes``, ``BACommunity``, ``TreeCycles``, ``TreeGrid``, ``ShortestPathSynthetic``
+   * - ``dehnn-netlist-dataset``
+     - DE-HNN MLCAD netlists (~43 GB) + ISPD16 netlists (~1.3 GB)
+     - ``DEHNNMLCADNetlistGraphs``, ``DEHNNISPD16NetlistGraphs``
+   * - ``circuitnet-design-graphs``
+     - CircuitNet standardized instance graphs (~1.4 GB)
+     - ``CircuitNetStandardizedGraphs``
+   * - ``superblue-processed-graph-features``
+     - Superblue processed node-feature and bipartite graphs (~18 GB)
+     - ``SuperblueProcessedGraphs``
 
-We added three tracked integration pieces:
+**Not on Hugging Face**:
 
-* ``nugets.datasets.research_catalog``:
-  a machine-readable manifest of the known server-local dataset families.
-* ``upload_research_datasets.py``:
-  a Hugging Face uploader that publishes selected local dataset folders with
-  ``huggingface_hub.upload_folder``.
-* domain-first local loaders under ``nugets.datasets``:
-  active v1 support for terrain shortest-path graphs, synthetic graph
-  reasoning datasets, and the main ChipDiffusion ASIC graph.
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
 
-Why we do not upload from repo root
------------------------------------
+   * - Dataset
+     - How to obtain
+   * - Superblue raw circuit data (~6 GB)
+     - Server-local only
+   * - DREAMPlace ASIC benchmarks (~2 GB)
+     - https://github.com/limbo018/DREAMPlace
+   * - DREAMPlaceFPGA benchmarks (~8 GB)
+     - https://github.com/zhilix/DREAMPlaceFPGA-MP
 
-This snippet is directionally correct:
+Downloading from Hugging Face
+------------------------------
 
-.. code-block:: python
+Use ``download_research_datasets.py`` to fetch datasets from the HF repo.
+Files are saved to ``data/server-local/<entry-slug>/`` by default (this
+directory is gitignored).
 
-   from huggingface_hub import login, upload_folder
+Install the dependency first::
 
-   login()
-   upload_folder(folder_path=".", repo_id="luckyjackluo/Neural-CG-Benchmark", repo_type="dataset")
+   uv add huggingface_hub
 
-But running it at the repository root would upload the benchmark source tree,
-not the actual datasets stored elsewhere on the server. For our case, the
-correct ``folder_path`` must point at the dataset directories themselves.
+List what is available::
 
-Uploader usage
---------------
+   python download_research_datasets.py --list
 
-Dry run:
+Download everything at once::
 
-.. code-block:: console
+   python download_research_datasets.py --all
+
+Download a specific entry::
+
+   python download_research_datasets.py --entry shortest-paths-terrain-patches
+
+Download to a custom directory::
+
+   python download_research_datasets.py --all --dest /path/to/my/datasets
+
+Preview what would be downloaded without fetching::
+
+   python download_research_datasets.py --all --dry-run
+
+The script prints the ``root=`` argument to pass to each loader class after
+the download finishes.  For example, after downloading
+``chipdiffusion-graph-dataset`` into the default ``data/`` directory::
+
+   from nugets.datasets import get_dataset_register
+   register = get_dataset_register()
+   ds = register["ChipDiffusionPygGraph"](
+       root="data/server-local/chipdiffusion-graph-dataset/datasets/graph/pyg_graph.pt"
+   )
+
+Skipping HF login
+^^^^^^^^^^^^^^^^^
+
+Set the ``HF_TOKEN`` environment variable and pass ``--skip-login``::
+
+   HF_TOKEN=hf_... python download_research_datasets.py --all --skip-login
+
+Uploading to Hugging Face
+--------------------------
+
+Use ``upload_research_datasets.py`` to push server-local datasets to the HF
+repo (requires write access).
+
+Dry run::
 
    python upload_research_datasets.py \
        --repo-id luckyjackluo/Neural-CG-Benchmark \
        --all \
        --dry-run
 
-Upload one dataset family:
-
-.. code-block:: console
+Upload one entry::
 
    python upload_research_datasets.py \
        --repo-id luckyjackluo/Neural-CG-Benchmark \
        --entry shortest-paths-terrain-patches
 
-Upload the catalog plus all primary datasets:
-
-.. code-block:: console
+Upload everything::
 
    python upload_research_datasets.py \
        --repo-id luckyjackluo/Neural-CG-Benchmark \
        --all
 
-What gets uploaded
-------------------
+The uploader publishes each source folder as
+``server-local/<entry-slug>/<folder-name>/`` inside the dataset repo.
 
-The uploader does two things:
+Active loaders
+--------------
 
-1. It uploads a generated metadata bundle to
-   ``server-local/catalog`` inside the target dataset repo.
-2. It uploads each selected local source folder to
-   ``server-local/<entry-slug>/<source-folder-name>``.
+These dataset classes are registered and ready to use:
 
-For example, ``shortest-paths-terrain-patches`` uploads the actual directories
-like:
+*ASIC physical design*
 
-* ``/data/zhishang/shortest-paths-nn/norway_patches``
-* ``/data/zhishang/shortest-paths-nn/holland_patches``
-* ``/data/zhishang/shortest-paths-nn/phil_patches``
+* ``ChipDiffusionPygGraph``
+* ``DEHNNMLCADNetlistGraphs``
+* ``CircuitNetStandardizedGraphs``
+* ``SuperblueProcessedGraphs``
 
-Integration status
-------------------
+*FPGA physical design*
 
-The benchmark now has:
+* ``DEHNNISPD16NetlistGraphs``
 
-* a tracked inventory of server-local datasets,
-* a documented distinction between downloaded public datasets and local
-  canonical datasets,
-* a Hugging Face export path using ``login`` and ``upload_folder``,
-* first-class dataset loaders for the stable local graph corpora.
-
-Active v1 loaders:
+*Terrain shortest-path*
 
 * ``NorwayTerrainPatches``
 * ``HollandTerrainPatches``
 * ``PhilTerrainPatches``
+
+*Synthetic graph reasoning*
+
 * ``BAShapes``
 * ``BACommunity``
 * ``TreeCycles``
 * ``TreeGrid``
 * ``ShortestPathSynthetic``
-* ``ChipDiffusionPygGraph``
 
-Still catalog-only:
+Still catalog-only (no active loader yet):
 
-* FPGA datasets whose sample schema is not yet normalized
-* DEHNN, CircuitNet, and Superblue variants that still need a canonical
-  benchmark-facing graph format
+* Superblue raw circuit data
+* DREAMPlace ASIC benchmarks
+* DREAMPlaceFPGA benchmarks

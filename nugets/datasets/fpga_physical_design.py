@@ -16,14 +16,17 @@ class DEHNNISPD16NetlistGraphs(Dataset[Graph_datapoint]):
     def __init__(
         self,
         *,
-        root: str = "/data/zhishang/DEHNN/de_hnn_tx/data/ispd/ispd16_netlist_data",
+        root: str = "data/server-local/dehnn-netlist-dataset/ispd16_netlist_data",
         which: str = "train",
         split_seed: int = 42,
         length: int | None = None,
     ):
         self.root = Path(root)
         if not self.root.exists():
-            raise FileNotFoundError(f"DE-HNN FPGA design root does not exist: {self.root}")
+            raise FileNotFoundError(
+                f"DE-HNN FPGA design root does not exist: {self.root}\n"
+                "Run: python download_research_datasets.py --entry dehnn-netlist-dataset"
+            )
         self.which = which
         self.split_seed = split_seed
         self.length = length

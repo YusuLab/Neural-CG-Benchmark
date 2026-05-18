@@ -37,6 +37,11 @@ class PygFileGraphDataset(SingleGraphDataset):
         super().__init__(which=which)
 
     def load_graph(self) -> Graph_datapoint:
+        if not self.root.exists():
+            raise FileNotFoundError(
+                f"Graph file does not exist: {self.root}\n"
+                "Run: python download_research_datasets.py --entry synthetic-graph-benchmarks"
+            )
         data = torch.load(self.root, map_location="cpu")
         return graph_datapoint_from_pyg(data)
 
@@ -49,22 +54,22 @@ class PygFileGraphDataset(SingleGraphDataset):
 
 @register
 class BAShapes(PygFileGraphDataset):
-    graph_path = "/data/zhishang/to_merge/gnn_agop/data/datasets/ba_shapes_300_80_pyg.pt"
+    graph_path = "data/server-local/synthetic-graph-benchmarks/datasets/ba_shapes_300_80_pyg.pt"
 
 
 @register
 class BACommunity(PygFileGraphDataset):
-    graph_path = "/data/zhishang/to_merge/gnn_agop/data/datasets/ba_community_350_100_pyg.pt"
+    graph_path = "data/server-local/synthetic-graph-benchmarks/datasets/ba_community_350_100_pyg.pt"
 
 
 @register
 class TreeCycles(PygFileGraphDataset):
-    graph_path = "/data/zhishang/to_merge/gnn_agop/data/datasets/tree_cycles_d8_c20_pyg.pt"
+    graph_path = "data/server-local/synthetic-graph-benchmarks/datasets/tree_cycles_d8_c20_pyg.pt"
 
 
 @register
 class TreeGrid(PygFileGraphDataset):
-    graph_path = "/data/zhishang/to_merge/gnn_agop/data/datasets/tree_grid_d8_g20_pyg.pt"
+    graph_path = "data/server-local/synthetic-graph-benchmarks/datasets/tree_grid_d8_g20_pyg.pt"
 
 
 @register
@@ -72,7 +77,7 @@ class ShortestPathSynthetic(SingleGraphDataset):
     def __init__(
         self,
         *,
-        root: str = "/data/zhishang/to_merge/gnn_agop/data/datasets/shortest_path_n300_p0",
+        root: str = "data/server-local/synthetic-graph-benchmarks/datasets/shortest_path_n300_p0",
         which: str = "train",
     ):
         self.root = Path(root)

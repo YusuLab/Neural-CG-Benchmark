@@ -29,7 +29,10 @@ class TerrainPatchDataset(Dataset[Graph_datapoint]):
     ):
         self.root = Path(root)
         if not self.root.exists():
-            raise FileNotFoundError(f"Terrain dataset root does not exist: {self.root}")
+            raise FileNotFoundError(
+                f"Terrain dataset root does not exist: {self.root}\n"
+                "Run: python download_research_datasets.py --entry shortest-paths-terrain-patches"
+            )
         self.which = which
         self.split_seed = split_seed
         self.length = length
@@ -64,7 +67,12 @@ class TerrainPatchDataset(Dataset[Graph_datapoint]):
 class NorwayTerrainPatches(TerrainPatchDataset):
     terrain_name = "norway"
 
-    def __init__(self, *, root: str = "/data/zhishang/shortest-paths-nn/norway_patches", **kwargs):
+    def __init__(
+        self,
+        *,
+        root: str = "data/server-local/shortest-paths-terrain-patches/norway_patches",
+        **kwargs,
+    ):
         super().__init__(root=root, **kwargs)
 
 
@@ -72,7 +80,12 @@ class NorwayTerrainPatches(TerrainPatchDataset):
 class HollandTerrainPatches(TerrainPatchDataset):
     terrain_name = "holland"
 
-    def __init__(self, *, root: str = "/data/zhishang/shortest-paths-nn/holland_patches", **kwargs):
+    def __init__(
+        self,
+        *,
+        root: str = "data/server-local/shortest-paths-terrain-patches/holland_patches",
+        **kwargs,
+    ):
         super().__init__(root=root, **kwargs)
 
 
@@ -80,5 +93,10 @@ class HollandTerrainPatches(TerrainPatchDataset):
 class PhilTerrainPatches(TerrainPatchDataset):
     terrain_name = "phil"
 
-    def __init__(self, *, root: str = "/data/zhishang/shortest-paths-nn/phil_patches", **kwargs):
+    def __init__(
+        self,
+        *,
+        root: str = "data/server-local/shortest-paths-terrain-patches/phil_patches",
+        **kwargs,
+    ):
         super().__init__(root=root, **kwargs)

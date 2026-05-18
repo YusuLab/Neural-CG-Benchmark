@@ -8,6 +8,9 @@ config.yaml
 .claude/
 local_dataset_state_summary.csv
 local_dataset_state_summary.md
+
+# Downloaded dataset files (see download_research_datasets.py)
+data/
 # Byte-compiled / optimized / DLL files
 workdir
 __pycache__/
