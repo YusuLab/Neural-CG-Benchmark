@@ -6,7 +6,7 @@ import torch
 from ml_lib.datasets import Dataset
 
 from nugets.datasets.datapoint_types import Graph_datapoint
-from nugets.datasets.local_dataset_utils import graph_datapoint_from_pyg, load_shortest_path_synthetic_graph
+from nugets.datasets.local_dataset_utils import load_shortest_path_synthetic_graph
 from nugets.datasets.register import register
 
 
@@ -43,33 +43,29 @@ class PygFileGraphDataset(SingleGraphDataset):
                 "Run: python download_research_datasets.py --entry synthetic-graph-benchmarks"
             )
         data = torch.load(self.root, map_location="cpu")
-        return graph_datapoint_from_pyg(data)
+        return self._pyg_to_graph_datapoint(data)
+
+    @staticmethod
+    def _pyg_to_graph_datapoint(data) -> Graph_datapoint:
+        if hasattr(data, "x") and data.x is not None:
+            features = data.x
+        elif hasattr(data, "feat") and data.feat is not None:
+            features = data.feat
+        else:
+            features = torch.ones((int(getattr(data, "num_nodes")), 1), dtype=torch.float32)
+        pointset = torch.as_tensor(features, dtype=torch.float32)
+        if pointset.ndim == 1:
+            pointset = pointset.unsqueeze(-1)
+        edges = torch.as_tensor(data.edge_index, dtype=torch.int64)
+        if edges.shape[0] != 2 and edges.shape[1] == 2:
+            edges = edges.t().contiguous()
+        return Graph_datapoint(pointset=pointset, edges=edges)
 
     def dataset_parameters(self):
         return {
             "root": str(self.root),
             "which": self.which,
         }
-
-
-@register
-class BAShapes(PygFileGraphDataset):
-    graph_path = "data/server-local/synthetic-graph-benchmarks/datasets/ba_shapes_300_80_pyg.pt"
-
-
-@register
-class BACommunity(PygFileGraphDataset):
-    graph_path = "data/server-local/synthetic-graph-benchmarks/datasets/ba_community_350_100_pyg.pt"
-
-
-@register
-class TreeCycles(PygFileGraphDataset):
-    graph_path = "data/server-local/synthetic-graph-benchmarks/datasets/tree_cycles_d8_c20_pyg.pt"
-
-
-@register
-class TreeGrid(PygFileGraphDataset):
-    graph_path = "data/server-local/synthetic-graph-benchmarks/datasets/tree_grid_d8_g20_pyg.pt"
 
 
 @register

@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Iterable
 import json
 import pickle
-import gzip
 
 import numpy as np
 import torch
@@ -36,37 +35,6 @@ def split_file_list(
     return file_list
 
 
-def ensure_2d_float_tensor(array) -> torch.Tensor:
-    tensor = torch.as_tensor(array, dtype=torch.float32)
-    if tensor.ndim == 1:
-        tensor = tensor.unsqueeze(-1)
-    return tensor
-
-
-def ensure_edge_index_tensor(array) -> torch.Tensor:
-    tensor = torch.as_tensor(array, dtype=torch.int64)
-    if tensor.ndim != 2:
-        raise ValueError(f"Expected a 2D edge tensor, got shape {tuple(tensor.shape)}")
-    if tensor.shape[0] != 2 and tensor.shape[1] == 2:
-        tensor = tensor.t().contiguous()
-    if tensor.shape[0] != 2:
-        raise ValueError(f"Expected edge tensor shape (2, E), got {tuple(tensor.shape)}")
-    return tensor
-
-
-def graph_datapoint_from_pyg(data) -> Graph_datapoint:
-    if hasattr(data, "x") and data.x is not None:
-        features = data.x
-    elif hasattr(data, "feat") and data.feat is not None:
-        features = data.feat
-    else:
-        num_nodes = int(getattr(data, "num_nodes"))
-        features = torch.ones((num_nodes, 1), dtype=torch.float32)
-    pointset = ensure_2d_float_tensor(features)
-    edges = ensure_edge_index_tensor(data.edge_index)
-    return Graph_datapoint(pointset=pointset, edges=edges)
-
-
 def load_shortest_path_synthetic_graph(base_path: Path) -> Graph_datapoint:
     with base_path.with_name(base_path.name + "_graph.gpickle").open("rb") as handle:
         graph = pickle.load(handle)
@@ -84,44 +52,4 @@ def load_shortest_path_synthetic_graph(base_path: Path) -> Graph_datapoint:
         directed_edges.append((src_idx, dst_idx))
         directed_edges.append((dst_idx, src_idx))
     edges = torch.tensor(directed_edges, dtype=torch.int64).t().contiguous()
-    return Graph_datapoint(pointset=pointset, edges=edges)
-
-
-def load_dehnn_pyg_graph(path: Path) -> Graph_datapoint:
-    data = torch.load(path, map_location="cpu")
-    node_features = ensure_2d_float_tensor(getattr(data, "node_features"))
-    edges = ensure_edge_index_tensor(getattr(data, "edge_index_source_sink"))
-    return Graph_datapoint(pointset=node_features, edges=edges)
-
-
-def load_circuitnet_standardized_graph(path: Path) -> Graph_datapoint:
-    data = torch.load(path, map_location="cpu")
-    inst_features = ensure_2d_float_tensor(data["inst"].x)
-    edges = ensure_edge_index_tensor(data["inst", "to", "net"].edge_index)
-    return Graph_datapoint(pointset=inst_features, edges=edges)
-
-
-def load_pickle(path: Path):
-    if path.suffix == ".gz":
-        with gzip.open(path, "rb") as handle:
-            return pickle.load(handle)
-    with path.open("rb") as handle:
-        return pickle.load(handle)
-
-
-def load_superblue_processed_graph(node_feature_path: Path) -> Graph_datapoint:
-    suffix = ".node_features.pkl"
-    if not node_feature_path.name.endswith(suffix):
-        raise ValueError(f"Expected a Superblue node feature file, got {node_feature_path}")
-
-    design_prefix = node_feature_path.name[: -len(suffix)]
-    bipartite_path = node_feature_path.with_name(f"{design_prefix}.bipartite.pkl")
-    if not bipartite_path.exists():
-        raise FileNotFoundError(f"Superblue bipartite graph file does not exist: {bipartite_path}")
-
-    node_payload = load_pickle(node_feature_path)
-    bipartite_payload = load_pickle(bipartite_path)
-
-    pointset = ensure_2d_float_tensor(node_payload["instance_features"])
-    edges = ensure_edge_index_tensor(bipartite_payload["edge_index"])
     return Graph_datapoint(pointset=pointset, edges=edges)
