@@ -42,19 +42,19 @@ LOCAL_DATASET_CATALOG: tuple[DatasetCatalogEntry, ...] = (
         status="cataloged_only",
     ),
     DatasetCatalogEntry(
-        name="Superblue Processed Graph Features",
+        name="Superblue Congestion Graph Features",
         category="asic_physical_design",
         domain_module="asic_physical_design",
         description=(
             "Processed circuit graph artifacts for Superblue designs, including "
             "bipartite graphs, hypergraph star expansions, node and net features, "
-            "targets, partitions, and global metadata."
+            "per-instance congestion targets, partitions, and global metadata."
         ),
         local_paths=(
             "/data/zhishang/data/superblue/2023-03-06_data",
         ),
         formats=("pkl", "pkl.gz"),
-        suggested_datapoint_type="Graph_datapoint",
+        suggested_datapoint_type="SuperblueDesignReference",
         status="loader_supported",
     ),
     DatasetCatalogEntry(
@@ -154,25 +154,6 @@ LOCAL_DATASET_CATALOG: tuple[DatasetCatalogEntry, ...] = (
         formats=("log", "csv"),
         suggested_datapoint_type="unmapped",
         status="logs_only",
-    ),
-    DatasetCatalogEntry(
-        name="Shortest Paths Terrain Patches",
-        category="terrain_shortest_path",
-        domain_module="terrain_shortest_path",
-        description=(
-            "Large terrain patch collections for shortest-path distance "
-            "approximation, including Norway, Holland, and Phil terrain subsets "
-            "stored as compressed NumPy archives."
-        ),
-        local_paths=(
-            "/data/zhishang/shortest-paths-nn/norway_patches",
-            "/data/zhishang/shortest-paths-nn/holland_patches",
-            "/data/zhishang/shortest-paths-nn/phil_patches",
-            "/data/zhishang/shortest-paths-nn/dataset",
-        ),
-        formats=("npz", "py"),
-        suggested_datapoint_type="Graph_datapoint",
-        status="loader_supported",
     ),
     DatasetCatalogEntry(
         name="Synthetic Graph Benchmarks",

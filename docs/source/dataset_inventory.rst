@@ -58,11 +58,6 @@ Dataset families
      - unmapped
      - logs only
      - ``/data/zhishang/UnifiedLearning/data/chipgen/test_logs``
-   * - Shortest Paths Terrain Patches
-     - ``terrain_shortest_path``
-     - ``Graph``
-     - loader supported
-     - ``/data/zhishang/shortest-paths-nn/norway_patches``
    * - Synthetic Graph Benchmarks
      - ``synthetic_graph_reasoning``
      - ``Graph``
@@ -79,15 +74,11 @@ Category notes
 
 ``asic_physical_design``
    Real ASIC physical-design datasets, placement graphs, and benchmark inputs.
-   ``ChipDiffusionPygGraph`` is the active v1 loader in this domain.
+   ``ChipSyntheticDataset`` is the active chip loader in this domain.
 
 ``fpga_physical_design``
    FPGA physical-design datasets and benchmarks. These are cataloged, but not
    yet normalized into a stable loader surface.
-
-``terrain_shortest_path``
-   Real terrain patch graphs used for shortest-path approximation. These are
-   active loaders through the terrain patch dataset classes.
 
 ``synthetic_graph_reasoning``
    Synthetic graph-learning corpora used for reasoning and explainability
@@ -107,7 +98,6 @@ Integration plan
 
 The current v1 loader surface is:
 
-* ``nugets.datasets.terrain_shortest_path``
 * ``nugets.datasets.synthetic_graph_reasoning``
 * ``nugets.datasets.asic_physical_design``
 

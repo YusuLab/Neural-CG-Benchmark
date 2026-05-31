@@ -15,17 +15,9 @@ HF_ENTRIES: dict[str, dict] = {
         "description": "ChipDiffusion graph dataset (ASIC physical design)",
         "loader_hints": [
             (
-                "ChipDiffusionPygGraph",
-                "{hf_root}/chipdiffusion-graph-dataset/datasets/graph/pyg_graph.pt",
+                "ChipSyntheticDataset",
+                "{hf_root}/chipdiffusion-graph-dataset",
             ),
-        ],
-    },
-    "shortest-paths-terrain-patches": {
-        "description": "Terrain shortest-path patches (Norway, Holland, Phil)",
-        "loader_hints": [
-            ("NorwayTerrainPatches", "{hf_root}/shortest-paths-terrain-patches/norway_patches"),
-            ("HollandTerrainPatches", "{hf_root}/shortest-paths-terrain-patches/holland_patches"),
-            ("PhilTerrainPatches", "{hf_root}/shortest-paths-terrain-patches/phil_patches"),
         ],
     },
     "synthetic-graph-benchmarks": {
@@ -45,29 +37,29 @@ HF_ENTRIES: dict[str, dict] = {
         "description": "DE-HNN netlist graphs — MLCAD (ASIC, ~43 GB) and ISPD16 (FPGA, ~1.3 GB)",
         "loader_hints": [
             (
-                "DEHNNMLCADNetlistGraphs",
+                "DEHNNMLCADCongestionDataset",
                 "{hf_root}/dehnn-netlist-dataset/all_designs_netlist_data",
             ),
             (
-                "DEHNNISPD16NetlistGraphs",
+                "DEHNNISPD16SiteUtilizationDataset",
                 "{hf_root}/dehnn-netlist-dataset/ispd16_netlist_data",
             ),
         ],
     },
     "circuitnet-design-graphs": {
-        "description": "CircuitNet standardized instance graphs (ASIC, ~1.4 GB)",
+        "description": "CircuitNet standardized instance-congestion data (ASIC, ~1.4 GB)",
         "loader_hints": [
             (
-                "CircuitNetStandardizedGraphs",
+                "CircuitNetCongestionDataset",
                 "{hf_root}/circuitnet-design-graphs/processed_standardized",
             ),
         ],
     },
     "superblue-processed-graph-features": {
-        "description": "Superblue processed node-feature and bipartite graph files (ASIC, ~18 GB)",
+        "description": "Superblue processed congestion graph features and targets (ASIC, ~18 GB)",
         "loader_hints": [
             (
-                "SuperblueProcessedGraphs",
+                "SuperblueCongestionDataset",
                 "{hf_root}/superblue-processed-graph-features/2023-03-06_data",
             ),
         ],
