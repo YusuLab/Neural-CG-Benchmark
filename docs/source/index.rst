@@ -11,8 +11,6 @@
 
    self
    running
-   dataset_inventory
-   server_local_datasets
    cloud_integration
 
 

@@ -40,7 +40,7 @@ class ChipSyntheticDataset(Dataset[ChipDesignReference]):
         if not self.root.exists():
             raise FileNotFoundError(
                 f"ChipDiffusion graph root does not exist: {self.root}\n"
-                "Run: python download_research_datasets.py --entry chipdiffusion-graph-dataset"
+                "Download from: https://huggingface.co/datasets/luckyjackluo/Neural-CG-Benchmark"
             )
         self.paths = split_file_list(
             self._discover_design_paths(self.root),
@@ -174,7 +174,7 @@ class ChipCircuitNetDataset(Dataset[CircuitNetDesignReference]):
         if not self.root.exists():
             raise FileNotFoundError(
                 f"CircuitNet congestion root does not exist: {self.root}\n"
-                "Run: python download_research_datasets.py --entry circuitnet-design-graphs"
+                "Download from: https://huggingface.co/datasets/luckyjackluo/Neural-CG-Benchmark"
             )
         self.which = which
         self.split_seed = split_seed
@@ -219,7 +219,7 @@ class ChipASICDataset(Dataset[SuperblueDesignReference]):
         if not self.root.exists():
             raise FileNotFoundError(
                 f"Superblue congestion root does not exist: {self.root}\n"
-                "Run: python download_research_datasets.py --entry superblue-processed-graph-features"
+                "Download from: https://huggingface.co/datasets/luckyjackluo/Neural-CG-Benchmark"
             )
         self.which = which
         self.split_seed = split_seed

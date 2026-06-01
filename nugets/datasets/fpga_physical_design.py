@@ -48,7 +48,7 @@ class ChipFPGADataset(Dataset[ChipFPGADesignReference]):
         if not self.root.exists():
             raise FileNotFoundError(
                 f"DE-HNN {source.upper()} netlist root does not exist: {self.root}\n"
-                "Run: python download_research_datasets.py --entry dehnn-netlist-dataset"
+                "Download from: https://huggingface.co/datasets/luckyjackluo/Neural-CG-Benchmark"
             )
         if not self.target_root.exists():
             raise FileNotFoundError(
