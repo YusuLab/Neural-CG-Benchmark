@@ -1,20 +1,43 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Iterable
 
+import numpy as np
 from ml_lib.datasets import Dataset
 
+from nugets.datasets.data_transforms import split_indices
 from nugets.datasets.datapoint_types import (
     ChipDesignReference,
     CircuitNetDesignReference,
     SuperblueDesignReference,
 )
-from nugets.datasets.local_dataset_utils import split_file_list
 from nugets.datasets.register import register
 
 
+class _ChipDatasetBase:
+    @staticmethod
+    def _split_paths(
+        files: Iterable[Path],
+        *,
+        which: str,
+        split_seed: int,
+        length: int | None = None,
+    ) -> list[Path]:
+        normalized = "val" if which == "ood" else which
+        file_list = sorted(files)
+        if normalized in ("train", "val") and len(file_list) >= 2:
+            rng = np.random.default_rng(split_seed)
+            split_map = split_indices(len(file_list), 0.9, 0.1, rng=rng)
+            split_number = 0 if normalized == "train" else 1
+            file_list = [p for p, s in zip(file_list, split_map) if s == split_number]
+        if length is not None:
+            file_list = file_list[:length]
+        return file_list
+
+
 @register
-class ChipSyntheticDataset(Dataset[ChipDesignReference]):
+class ChipSyntheticDataset(_ChipDatasetBase, Dataset[ChipDesignReference]):
     datatype = ChipDesignReference
     hf_slug = "chipdiffusion-graph-dataset"
     default_root = "data/server-local/chipdiffusion-graph-dataset"
@@ -42,7 +65,7 @@ class ChipSyntheticDataset(Dataset[ChipDesignReference]):
                 f"ChipDiffusion graph root does not exist: {self.root}\n"
                 "Download from: https://huggingface.co/datasets/luckyjackluo/Neural-CG-Benchmark"
             )
-        self.paths = split_file_list(
+        self.paths = self._split_paths(
             self._discover_design_paths(self.root),
             which=which,
             split_seed=split_seed,
@@ -159,7 +182,7 @@ class ChipSyntheticDataset(Dataset[ChipDesignReference]):
 
 
 @register
-class ChipCircuitNetDataset(Dataset[CircuitNetDesignReference]):
+class ChipCircuitNetDataset(_ChipDatasetBase, Dataset[CircuitNetDesignReference]):
     datatype = CircuitNetDesignReference
 
     def __init__(
@@ -180,7 +203,7 @@ class ChipCircuitNetDataset(Dataset[CircuitNetDesignReference]):
         self.split_seed = split_seed
         self.length = length
         graph_files = sorted(self.root.glob("*_standardized.pt"))
-        self.paths = split_file_list(graph_files, which=which, split_seed=split_seed, length=length)
+        self.paths = self._split_paths(graph_files, which=which, split_seed=split_seed, length=length)
 
     def __len__(self):
         return len(self.paths)
@@ -204,7 +227,7 @@ class ChipCircuitNetDataset(Dataset[CircuitNetDesignReference]):
 
 
 @register
-class ChipASICDataset(Dataset[SuperblueDesignReference]):
+class ChipASICDataset(_ChipDatasetBase, Dataset[SuperblueDesignReference]):
     datatype = SuperblueDesignReference
 
     def __init__(
@@ -224,7 +247,7 @@ class ChipASICDataset(Dataset[SuperblueDesignReference]):
         self.which = which
         self.split_seed = split_seed
         self.length = length
-        self.paths = split_file_list(
+        self.paths = self._split_paths(
             self._discover_node_feature_files(),
             which=which,
             split_seed=split_seed,

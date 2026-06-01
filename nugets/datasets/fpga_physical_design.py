@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Literal
+from typing import Iterable, Literal
 
+import numpy as np
 from ml_lib.datasets import Dataset
 
+from nugets.datasets.data_transforms import split_indices
 from nugets.datasets.datapoint_types import ChipFPGADesignReference
-from nugets.datasets.local_dataset_utils import split_file_list
 from nugets.datasets.register import register
 
 
@@ -17,6 +18,25 @@ class ChipFPGADataset(Dataset[ChipFPGADesignReference]):
 
     _MLCAD_DEFAULT_ROOT = "data/server-local/dehnn-netlist-dataset/all_designs_netlist_data"
     _ISPD16_DEFAULT_ROOT = "data/server-local/dehnn-netlist-dataset/ispd16_netlist_data"
+
+    @staticmethod
+    def _split_paths(
+        files: Iterable[Path],
+        *,
+        which: str,
+        split_seed: int,
+        length: int | None = None,
+    ) -> list[Path]:
+        normalized = "val" if which == "ood" else which
+        file_list = sorted(files)
+        if normalized in ("train", "val") and len(file_list) >= 2:
+            rng = np.random.default_rng(split_seed)
+            split_map = split_indices(len(file_list), 0.9, 0.1, rng=rng)
+            split_number = 0 if normalized == "train" else 1
+            file_list = [p for p, s in zip(file_list, split_map) if s == split_number]
+        if length is not None:
+            file_list = file_list[:length]
+        return file_list
 
     def __init__(
         self,
@@ -57,7 +77,7 @@ class ChipFPGADataset(Dataset[ChipFPGADesignReference]):
         self.which = which
         self.split_seed = split_seed
         self.length = length
-        self.paths = split_file_list(
+        self.paths = self._split_paths(
             self._discover_target_dirs(),
             which=which,
             split_seed=split_seed,
