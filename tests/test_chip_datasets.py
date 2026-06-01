@@ -318,7 +318,7 @@ def test_circuitnet_instance_congestion_graph_uses_avg_target_inst(tmp_path, mon
     assert torch.equal(sample.label, torch.tensor([[0.25], [0.5]]))
 
 
-def test_local_dataset_registry_contains_new_entries():
+def test_chip_dataset_registry_contains_entries():
     register = get_dataset_register()
     for name in (
         "ChipSyntheticDataset",
