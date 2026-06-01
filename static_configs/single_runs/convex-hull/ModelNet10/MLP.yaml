@@ -4,8 +4,8 @@ task:
   dataset_config:
     name: '10'
     size: 256
-  ood_dataset: ModelNetPointset
-  ood_dataset_config:
+  dataset: ModelNetPointset
+  dataset_config:
     name: '10'
     size: 512
 backbone:

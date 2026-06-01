@@ -3,13 +3,9 @@ task:
   dataset: SQUIDBoundaries
   dataset_config:
     normalization: True
-  ood_dataset: GaussianBlobs
+  ood_dataset: SQUIDBoundaries
   ood_config:
-    length: 300
-    min_points: 200
-    max_points: 300
-    centers: 4
-    dim: 2
+    normalization: True
 backbone:
   type: Sumformer
   n_heads: 1
