@@ -58,11 +58,6 @@ Dataset families
      - unmapped
      - logs only
      - ``/data/zhishang/UnifiedLearning/data/chipgen/test_logs``
-   * - Synthetic Graph Benchmarks
-     - ``synthetic_graph_reasoning``
-     - ``Graph``
-     - loader supported
-     - ``/data/zhishang/to_merge/gnn_agop/data/datasets``
    * - Mirrored GitHub Research Datasets
      - ``mirrors``
      - unmapped
@@ -80,11 +75,6 @@ Category notes
    FPGA physical-design datasets and benchmarks. These are cataloged, but not
    yet normalized into a stable loader surface.
 
-``synthetic_graph_reasoning``
-   Synthetic graph-learning corpora used for reasoning and explainability
-   experiments. These are active loaders through the single-graph dataset
-   classes.
-
 ``experiment_logs``
    Run outputs and merged reports. Useful for provenance and analysis, but not a
    dataset family to register directly.
@@ -98,7 +88,6 @@ Integration plan
 
 The current v1 loader surface is:
 
-* ``nugets.datasets.synthetic_graph_reasoning``
 * ``nugets.datasets.asic_physical_design``
 
 The FPGA and some additional ASIC corpora remain catalog-only until their

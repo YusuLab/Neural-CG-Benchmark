@@ -321,7 +321,6 @@ def test_circuitnet_instance_congestion_graph_uses_avg_target_inst(tmp_path, mon
 def test_local_dataset_registry_contains_new_entries():
     register = get_dataset_register()
     for name in (
-        "ShortestPathSynthetic",
         "ChipSyntheticDataset",
         "ChipFPGADataset",
         "ChipCircuitNetDataset",

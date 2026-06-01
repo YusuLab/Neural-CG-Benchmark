@@ -20,19 +20,6 @@ HF_ENTRIES: dict[str, dict] = {
             ),
         ],
     },
-    "synthetic-graph-benchmarks": {
-        "description": "Synthetic graph reasoning benchmarks (BA-shapes, tree-cycles, etc.)",
-        "loader_hints": [
-            ("BAShapes", "{hf_root}/synthetic-graph-benchmarks/datasets/ba_shapes_300_80_pyg.pt"),
-            ("BACommunity", "{hf_root}/synthetic-graph-benchmarks/datasets/ba_community_350_100_pyg.pt"),
-            ("TreeCycles", "{hf_root}/synthetic-graph-benchmarks/datasets/tree_cycles_d8_c20_pyg.pt"),
-            ("TreeGrid", "{hf_root}/synthetic-graph-benchmarks/datasets/tree_grid_d8_g20_pyg.pt"),
-            (
-                "ShortestPathSynthetic",
-                "{hf_root}/synthetic-graph-benchmarks/datasets/shortest_path_n300_p0",
-            ),
-        ],
-    },
     "dehnn-netlist-dataset": {
         "description": "DE-HNN netlist graphs — MLCAD (ASIC, ~43 GB) and ISPD16 (FPGA, ~1.3 GB)",
         "loader_hints": [

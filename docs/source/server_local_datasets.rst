@@ -18,9 +18,6 @@ The benchmark datasets fall into two groups:
    * - ``chipdiffusion-graph-dataset``
      - ChipDiffusion ASIC graph (PyG format)
      - ``ChipSyntheticDataset``
-   * - ``synthetic-graph-benchmarks``
-     - Synthetic graph reasoning benchmarks (BA-shapes, tree-cycles, etc.)
-     - ``BAShapes``, ``BACommunity``, ``TreeCycles``, ``TreeGrid``, ``ShortestPathSynthetic``
    * - ``dehnn-netlist-dataset``
      - DE-HNN MLCAD netlists (~43 GB) + ISPD16 netlists (~1.3 GB)
      - ``DEHNNMLCADCongestionDataset``, ``DEHNNISPD16SiteUtilizationDataset``
@@ -67,7 +64,7 @@ Download everything at once::
 
 Download a specific entry::
 
-   python download_research_datasets.py --entry synthetic-graph-benchmarks
+   python download_research_datasets.py --entry dehnn-netlist-dataset
 
 Download to a custom directory::
 
@@ -111,7 +108,7 @@ Upload one entry::
 
    python upload_research_datasets.py \
        --repo-id luckyjackluo/Neural-CG-Benchmark \
-       --entry synthetic-graph-benchmarks
+       --entry dehnn-netlist-dataset
 
 Upload everything::
 
@@ -137,14 +134,6 @@ These dataset classes are registered and ready to use:
 *FPGA physical design*
 
 * ``DEHNNISPD16SiteUtilizationDataset``
-
-*Synthetic graph reasoning*
-
-* ``BAShapes``
-* ``BACommunity``
-* ``TreeCycles``
-* ``TreeGrid``
-* ``ShortestPathSynthetic``
 
 Still catalog-only (no active loader yet):
 

@@ -156,23 +156,6 @@ LOCAL_DATASET_CATALOG: tuple[DatasetCatalogEntry, ...] = (
         status="logs_only",
     ),
     DatasetCatalogEntry(
-        name="Synthetic Graph Benchmarks",
-        category="synthetic_graph_reasoning",
-        domain_module="synthetic_graph_reasoning",
-        description=(
-            "Small graph-learning benchmarks with stored labels, features, "
-            "NetworkX graph objects, and PyG tensors. These include BA shapes, "
-            "tree-grid, tree-cycles, and shortest-path synthetic graphs."
-        ),
-        local_paths=(
-            "/data/zhishang/to_merge/gnn_agop/data/datasets",
-            "/data/zhishang/to_merge/graph-learning-merged/data",
-        ),
-        formats=("pt", "json", "gpickle", "png"),
-        suggested_datapoint_type="Graph_datapoint",
-        status="loader_supported",
-    ),
-    DatasetCatalogEntry(
         name="Mirrored GitHub Research Datasets",
         category="mirrors",
         domain_module="",
