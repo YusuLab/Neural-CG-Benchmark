@@ -32,7 +32,7 @@ class Graph_datapoint(Set_datapoint):
     def collate(cls, points):
         input_sets = [p.pointset for p in points]
         set_batch = Batch.from_list(input_sets, order=1)
-        set_ptr = set_batch.ptr[:-1]
+        set_ptr = set_batch.ptr
         edges = [p.edges + offset for p, offset in zip(points, set_ptr)]
         edges_batch = torch.cat(edges, dim=1)
         return Graph_batch(set_batch, edges_batch)
@@ -53,7 +53,7 @@ class LabeledGraphDatapoint(Graph_datapoint):
         labelsets = [p.label for p in points]
         set_batch = Batch.from_list(input_sets, order=1)
         label_batch = Batch.from_list(labelsets, order=1)
-        set_ptr = set_batch.ptr[:-1]
+        set_ptr = set_batch.ptr
         edges = [p.edges + offset for p, offset in zip(points, set_ptr)]
         edges_batch = torch.cat(edges, dim=1)
         return LabeledGraphBatch(set_batch, edges_batch, label_batch)
@@ -72,7 +72,7 @@ class GraphTensorLabelDatapoint(Graph_datapoint):
     def collate(cls, points):
         input_sets = [p.pointset for p in points]
         set_batch = Batch.from_list(input_sets, order=1)
-        set_ptr = set_batch.ptr[:-1]
+        set_ptr = set_batch.ptr
         edges = [p.edges + offset for p, offset in zip(points, set_ptr)]
         edges_batch = torch.cat(edges, dim=1)
         labels = torch.stack([p.label for p in points])
@@ -246,7 +246,7 @@ class MaskedGraphDatapoint(Graph_datapoint):
         labelsets = [p.label for p in points]
         set_batch = Batch.from_list(input_sets, order=1)
         label_batch = Batch.from_list(labelsets, order=1)
-        set_ptr = set_batch.ptr[:-1]
+        set_ptr = set_batch.ptr
         edges = [p.edges + offset for p, offset in zip(points, set_ptr)]
         labeled_nodes = [
             p.labeled_nodes.to(dtype=torch.int64) + offset
