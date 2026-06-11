@@ -1,22 +1,26 @@
 task:
-  type: HausdorffDistanceTask
-  dataset: ModelNetPointset
+  type: DynamicTimeWarpingTask
+  dataset: RandomTrajectory
   dataset_config:
-    name: '10'
-    size: 256
-    length: 200
-  ood_dataset: ModelNetPointset
+    length: 100
+    min_points: 10
+    max_points: 20
+    type: Langevin
+    scaling: 10
+  ood_dataset: RandomTrajectory
   ood_config:
-    name: '10'
-    size: 512
-    length: 200
+    length: 10
+    min_points: 15
+    max_points: 25
+    type: Langevin
+    scaling: 10
 backbone:
   type: CoupledNetwork
   latent_dimension: 32
   p: 1
   reconstruct_input: false
   decoder_distance: SinkhornLoss
-  use_siamese: false
+  use_siamese: True
   aggregation: mean
   encoder:
     type: Performer
@@ -24,6 +28,7 @@ backbone:
     n_layers: 3
     d_model: 64
     feed_forward_hidden_dim: 128
+  positional_encoding: SinusoidalAbsolutePositionalEncoding
 batch_size: 128
 learning_rate: 0.0001
 debug_mode: true
