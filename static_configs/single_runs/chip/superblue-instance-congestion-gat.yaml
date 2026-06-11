@@ -1,0 +1,18 @@
+task:
+  type: ChipASICCongestionTask
+  dataset: ChipASICDataset
+  dataset_config:
+    length: 4
+  ood_dataset: ChipASICDataset
+  ood_config:
+    length: 2
+backbone:
+  type: GAT
+  input_dim: 64
+  output_dim: 64
+  n_heads: 4
+  n_layers: 3
+  feed_forward_hidden_dim: 128
+batch_size: 1
+learning_rate: 1.e-4
+loss_function: mse_loss

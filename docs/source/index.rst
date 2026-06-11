@@ -24,4 +24,3 @@ Packages
    :template: custom-module-template.rst
    
    nugets
-

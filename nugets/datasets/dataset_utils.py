@@ -2,6 +2,7 @@ import requests
 from pathlib import Path
 import zipfile
 
+
 def download_from_url(url: str, savepath: Path, chunk_size: int=1024*1024):
     """
     Downloads raw data from a url into the directory specified in savepath
