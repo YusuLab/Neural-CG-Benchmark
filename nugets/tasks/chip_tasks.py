@@ -24,6 +24,12 @@ from nugets.datasets.datapoint_types import (
     SuperblueDesignReference,
 )
 from nugets.models.backbone import BackBone
+from nugets.models.encoder_decoders.chip_encoders import (
+    GraphIndexedNodeRegressionEncoderDecoder,
+    GraphMapRegressionEncoderDecoder,
+    GraphMaskedNodeRegressionEncoderDecoder,
+    GraphNodeRegressionEncoderDecoder,
+)
 
 from .register import register
 from .task import Task
@@ -141,36 +147,6 @@ class ChipPlacementTransform(Transform):
             return _ensure_2d_float_tensor(payload.placement)
         return _ensure_2d_float_tensor(payload)
 
-
-class GraphNodeRegressionEncoderDecoder(torch.nn.Module):
-    def __init__(
-        self,
-        *,
-        input_dim: int,
-        backbone_input_dim: int,
-        backbone_output_dim: int,
-        output_dim: int,
-        loss_function: str = "mse_loss",
-    ):
-        super().__init__()
-        self.in_proj = torch.nn.Linear(input_dim, backbone_input_dim)
-        self.out_proj = torch.nn.Linear(backbone_output_dim, output_dim)
-        if loss_function != "mse_loss":
-            raise ValueError("ChipPlacementTask currently supports only mse_loss")
-        self.loss_function = torch.nn.functional.mse_loss
-
-    def encode(self, batch: LabeledGraphBatch):
-        pointset = self.in_proj(batch.pointset)
-        return LabeledGraphBatch(pointset=pointset, edges=batch.edges, label=batch.label), None
-
-    def decode(self, backbone_result):
-        return self.out_proj(backbone_result)
-
-    def compute_loss(self, batch: LabeledGraphBatch, backbone_result, encoder_info):
-        del encoder_info
-        prediction = self.decode(backbone_result)
-        prediction_data = getattr(prediction, "data", prediction)
-        return self.loss_function(prediction_data, batch.label.data)
 
 
 class ChipFPGARouteUtilizationTransform(Transform):
@@ -333,106 +309,6 @@ class ChipASICCongestionTransform(Transform):
             labeled_nodes=torch.arange(inst_features.shape[0], dtype=torch.int64),
         )
 
-
-class GraphMapRegressionEncoderDecoder(torch.nn.Module):
-    def __init__(
-        self,
-        *,
-        input_dim: int,
-        backbone_input_dim: int,
-        backbone_output_dim: int,
-        output_shape: tuple[int, int],
-        loss_function: str = "mse_loss",
-    ):
-        super().__init__()
-        self.in_proj = torch.nn.Linear(input_dim, backbone_input_dim)
-        self.out_proj = torch.nn.Linear(backbone_output_dim, output_shape[0] * output_shape[1])
-        self.output_shape = output_shape
-        if loss_function != "mse_loss":
-            raise ValueError("ChipFPGARouteUtilizationTask currently supports only mse_loss")
-        self.loss_function = torch.nn.functional.mse_loss
-
-    def encode(self, batch: GraphTensorLabelBatch):
-        pointset = self.in_proj(batch.pointset)
-        return GraphTensorLabelBatch(pointset=pointset, edges=batch.edges, label=batch.label), None
-
-    def decode(self, backbone_result):
-        pooled = backbone_result.mean()
-        return self.out_proj(pooled).reshape((-1, *self.output_shape))
-
-    def compute_loss(self, batch: GraphTensorLabelBatch, backbone_result, encoder_info):
-        del encoder_info
-        prediction = self.decode(backbone_result)
-        return self.loss_function(prediction, batch.label)
-
-
-class GraphMaskedNodeRegressionEncoderDecoder(torch.nn.Module):
-    def __init__(
-        self,
-        *,
-        input_dim: int,
-        backbone_input_dim: int,
-        backbone_output_dim: int,
-        output_dim: int = 1,
-        loss_function: str = "mse_loss",
-    ):
-        super().__init__()
-        self.in_proj = torch.nn.Linear(input_dim, backbone_input_dim)
-        self.out_proj = torch.nn.Linear(backbone_output_dim, output_dim)
-        if loss_function != "mse_loss":
-            raise ValueError("Graph masked node regression currently supports only mse_loss")
-        self.loss_function = torch.nn.functional.mse_loss
-
-    def encode(self, batch: GraphTensorLabelBatch):
-        pointset = self.in_proj(batch.pointset)
-        return GraphTensorLabelBatch(pointset=pointset, edges=batch.edges, label=batch.label), None
-
-    def decode(self, backbone_result):
-        return self.out_proj(backbone_result)
-
-    def compute_loss(self, batch: GraphTensorLabelBatch, backbone_result, encoder_info):
-        del encoder_info
-        prediction = self.decode(backbone_result).data
-        target = batch.label.reshape(-1, batch.label.shape[-1])
-        return self.loss_function(prediction[: target.shape[0]], target)
-
-
-class GraphIndexedNodeRegressionEncoderDecoder(torch.nn.Module):
-    def __init__(
-        self,
-        *,
-        input_dim: int,
-        backbone_input_dim: int,
-        backbone_output_dim: int,
-        output_dim: int = 1,
-        loss_function: str = "mse_loss",
-    ):
-        super().__init__()
-        self.in_proj = torch.nn.Linear(input_dim, backbone_input_dim)
-        self.out_proj = torch.nn.Linear(backbone_output_dim, output_dim)
-        if loss_function != "mse_loss":
-            raise ValueError("Graph indexed node regression currently supports only mse_loss")
-        self.loss_function = torch.nn.functional.mse_loss
-
-    def encode(self, batch: MaskedGraphBatch):
-        pointset = self.in_proj(batch.pointset)
-        return (
-            MaskedGraphBatch(
-                pointset=pointset,
-                edges=batch.edges,
-                label=batch.label,
-                labeled_nodes=batch.labeled_nodes,
-            ),
-            None,
-        )
-
-    def decode(self, backbone_result):
-        return self.out_proj(backbone_result)
-
-    def compute_loss(self, batch: MaskedGraphBatch, backbone_result, encoder_info):
-        del encoder_info
-        prediction = self.decode(backbone_result).data[batch.labeled_nodes]
-        return self.loss_function(prediction, batch.label.data)
 
 
 @register

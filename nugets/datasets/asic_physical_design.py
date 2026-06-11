@@ -16,6 +16,10 @@ from nugets.datasets.register import register
 
 
 class _ChipDatasetBase:
+    hf_slug: str = ""
+    _HF_REPO_ID = "luckyjackluo/Neural-CG-Benchmark"
+    _HF_PREFIX = "server-local"
+
     @staticmethod
     def _split_paths(
         files: Iterable[Path],
@@ -34,6 +38,34 @@ class _ChipDatasetBase:
         if length is not None:
             file_list = file_list[:length]
         return file_list
+
+    def _auto_download(self, dest: str | Path | None = None) -> None:
+        try:
+            from huggingface_hub import snapshot_download
+        except ImportError as exc:
+            raise ImportError(
+                "huggingface_hub is required for automatic dataset downloads. "
+                "Install it with: pip install huggingface_hub"
+            ) from exc
+
+        root: Path = self.root  # type: ignore[attr-defined]
+        if dest is not None:
+            download_dest = Path(dest)
+        else:
+            parts = root.parts
+            if self._HF_PREFIX in parts:
+                idx = parts.index(self._HF_PREFIX)
+                download_dest = Path(".") if idx == 0 else Path(*parts[:idx])
+            else:
+                download_dest = Path("data")
+
+        snapshot_download(
+            repo_id=self._HF_REPO_ID,
+            repo_type="dataset",
+            allow_patterns=[f"{self._HF_PREFIX}/{self.hf_slug}/**"],
+            local_dir=str(download_dest),
+            local_dir_use_symlinks=False,
+        )
 
 
 @register
@@ -184,6 +216,7 @@ class ChipSyntheticDataset(_ChipDatasetBase, Dataset[ChipDesignReference]):
 @register
 class ChipCircuitNetDataset(_ChipDatasetBase, Dataset[CircuitNetDesignReference]):
     datatype = CircuitNetDesignReference
+    hf_slug = "circuitnet-design-graphs"
 
     def __init__(
         self,
@@ -192,16 +225,22 @@ class ChipCircuitNetDataset(_ChipDatasetBase, Dataset[CircuitNetDesignReference]
         which: str = "train",
         split_seed: int = 42,
         length: int | None = None,
+        auto_download: bool = True,
+        download_root: str | None = None,
     ):
         self.root = Path(root)
+        self.which = which
+        self.split_seed = split_seed
+        self.length = length
+        self.auto_download = auto_download
+        self.download_root = download_root
+        if not self.root.exists() and auto_download:
+            self._auto_download(download_root)
         if not self.root.exists():
             raise FileNotFoundError(
                 f"CircuitNet congestion root does not exist: {self.root}\n"
                 "Download from: https://huggingface.co/datasets/luckyjackluo/Neural-CG-Benchmark"
             )
-        self.which = which
-        self.split_seed = split_seed
-        self.length = length
         graph_files = sorted(self.root.glob("*_standardized.pt"))
         self.paths = self._split_paths(graph_files, which=which, split_seed=split_seed, length=length)
 
@@ -223,12 +262,15 @@ class ChipCircuitNetDataset(_ChipDatasetBase, Dataset[CircuitNetDesignReference]
             "which": self.which,
             "split_seed": self.split_seed,
             "length": self.length,
+            "auto_download": self.auto_download,
+            "download_root": self.download_root,
         }
 
 
 @register
 class ChipASICDataset(_ChipDatasetBase, Dataset[SuperblueDesignReference]):
     datatype = SuperblueDesignReference
+    hf_slug = "superblue-processed-graph-features"
 
     def __init__(
         self,
@@ -237,16 +279,22 @@ class ChipASICDataset(_ChipDatasetBase, Dataset[SuperblueDesignReference]):
         which: str = "train",
         split_seed: int = 42,
         length: int | None = None,
+        auto_download: bool = True,
+        download_root: str | None = None,
     ):
         self.root = Path(root)
+        self.which = which
+        self.split_seed = split_seed
+        self.length = length
+        self.auto_download = auto_download
+        self.download_root = download_root
+        if not self.root.exists() and auto_download:
+            self._auto_download(download_root)
         if not self.root.exists():
             raise FileNotFoundError(
                 f"Superblue congestion root does not exist: {self.root}\n"
                 "Download from: https://huggingface.co/datasets/luckyjackluo/Neural-CG-Benchmark"
             )
-        self.which = which
-        self.split_seed = split_seed
-        self.length = length
         self.paths = self._split_paths(
             self._discover_node_feature_files(),
             which=which,
@@ -291,4 +339,6 @@ class ChipASICDataset(_ChipDatasetBase, Dataset[SuperblueDesignReference]):
             "which": self.which,
             "split_seed": self.split_seed,
             "length": self.length,
+            "auto_download": self.auto_download,
+            "download_root": self.download_root,
         }
