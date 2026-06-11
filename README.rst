@@ -5,7 +5,7 @@ NUGETS — NeUral GEomeTry Suite
 About
 =====
 
-This is a machine learning benchmark for geometric problems. 
+This is a machine learning benchmark for geometric problems.
 
 Chores
 =======
