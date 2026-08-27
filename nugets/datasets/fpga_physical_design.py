@@ -18,7 +18,7 @@ class ChipFPGADataset(Dataset[ChipFPGADesignReference]):
 
     _MLCAD_DEFAULT_ROOT = "data/server-local/dehnn-netlist-dataset/all_designs_netlist_data"
     _ISPD16_DEFAULT_ROOT = "data/server-local/dehnn-netlist-dataset/ispd16_netlist_data"
-    _HF_REPO_ID = "luckyjackluo/Neural-CG-Benchmark"
+    _HF_REPO_ID = "geometricdatasets/Neural-CG-Benchmark"
     _HF_PREFIX = "server-local"
     _HF_SLUG = "dehnn-netlist-dataset"
 
@@ -104,7 +104,7 @@ class ChipFPGADataset(Dataset[ChipFPGADesignReference]):
         if not self.root.exists():
             raise FileNotFoundError(
                 f"DE-HNN {source.upper()} netlist root does not exist: {self.root}\n"
-                "Download from: https://huggingface.co/datasets/luckyjackluo/Neural-CG-Benchmark"
+                "Download from: https://huggingface.co/datasets/geometricdatasets/Neural-CG-Benchmark"
             )
         if not self.target_root.exists():
             raise FileNotFoundError(

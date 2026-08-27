@@ -17,7 +17,7 @@ from nugets.datasets.register import register
 
 class _ChipDatasetBase:
     hf_slug: str = ""
-    _HF_REPO_ID = "luckyjackluo/Neural-CG-Benchmark"
+    _HF_REPO_ID = "geometricdataset/Neural-CG-Benchmark"
     _HF_PREFIX = "server-local"
 
     @staticmethod

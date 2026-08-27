@@ -35,7 +35,9 @@ class NZDEM(Dataset[Set_datapoint]):
         self.n_points = n_points
         # Locations for all relevant parts of the dataset
         root_dir = Path("workdir/datasets/raw/nz_dem")
-        root_dir.mkdir(exist_ok=True, parents=True)
+        if not root_dir.exists():
+            print("Downloading and saving raw terrain data in ", root_dir)
+            root_dir.mkdir(exist_ok=True, parents=True)
         raw_dataset_pth = root_dir / 'nz_dem_pointcloud' / ('per_sample=' + str(n_points) + '.npz') # Where the cleaned data will live
         raw_dataset_pth.parent.mkdir(exist_ok=True, parents=True)
         zip_file_pth = root_dir / 'nzdem-may-2020.zip' # where zip file will be saved
