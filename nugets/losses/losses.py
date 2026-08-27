@@ -3,6 +3,7 @@ from geomloss import SamplesLoss
 import torch
 from torch.nn.functional import mse_loss, l1_loss, binary_cross_entropy_with_logits
 from torch_scatter import scatter
+from scipy.stats import uniform_direction
 
 import sys
 
@@ -41,28 +42,57 @@ def minimum_enclosing_ellipse_error(**kwargs):
 
 
 def scatter_binary_cross_entropy(predicted, target, index, reduction="mean", **kwargs):
-    " Batch compatible cross entropy loss "
+    """ Batch compatible cross entropy loss """
     unrolled = binary_cross_entropy_with_logits(input=predicted, target=target, reduction="none")
     per_set_bce_error=scatter(src=unrolled, index=index, reduce=reduction)
     return per_set_bce_error.mean()
 
-def binary_focal_loss(inputs, targets, gamma=2):
+def binary_focal_loss(input, target, gamma=5, reduction=None, **kwargs):
     """ Focal loss for binary classification. """
-    probs = torch.sigmoid(inputs)
-    targets = targets.float()
+    probs = torch.sigmoid(input)
+    targets = target.float()
 
     # Compute binary cross entropy
-    bce_loss = binary_cross_entropy_with_logits(inputs, targets, reduction='none')
+    bce_loss = binary_cross_entropy_with_logits(input, targets, reduction='none')
 
     # Compute focal weight
     p_t = probs * targets + (1 - probs) * (1 - targets)
     focal_weight = (1 - p_t) ** gamma
 
     loss = focal_weight * bce_loss
-
-    return loss
+    if reduction is None:
+        return loss
+    elif reduction == 'sum':
+        return loss.sum()
+    else:
+        return loss.mean()
 
 def scatter_binary_focal_loss(predicted, target, index, reduction='mean', **kwargs):
-    unrolled = binary_focal_loss(inputs=predicted, targets=target)
+    unrolled = binary_focal_loss(input=predicted, target=target)
     per_set_fl_error = scatter(src=unrolled, index=index, reduce=reduction)
     return per_set_fl_error.mean()
+
+def directional_width_loss(predicted, target, in_dim,n=100, **kwargs):
+    """
+    Measures difference in directional width. 
+    See https://users.cs.duke.edu/~pankaj/publications/surveys/coreset-survey.pdf for more information. 
+    """
+    uniform_sphere_dist = uniform_direction.rvs(dim=in_dim)
+    directions = torch.tensor(uniform_sphere_dist.rvs(n=100), dtype=torch.float32)
+    
+    proj_predicted = torch.matmul(predicted, directions)
+    proj_target = torch.matmul(target, directions)
+
+
+    max_p = scatter(x = proj_predicted.data, batch = proj_predicted.batch1, reduce='max') #add batch indicator manually
+    max_q = scatter(x = proj_target.data, batch = proj_target.batch1, reduce='max')
+
+    min_p = -1 * scatter(x = -1 * proj_predicted.data, batch = proj_predicted.batch1, reduce='max')
+    min_q = -1 * scatter(x = -1 * proj_target.data, batch = proj_target.batch1, reduce='max')
+
+    diff_max = torch.abs(max_q - max_p)
+    diff_min = torch.abs(min_q - min_p)
+
+    losses = torch.sum(diff_max + diff_min, dim=1)
+    
+    return torch.mean(losses)

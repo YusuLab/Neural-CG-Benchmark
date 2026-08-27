@@ -108,10 +108,13 @@ class CoupledNetwork(BackBone):
                 agg1 = v1.sum()
                 agg2 = v2.sum()
             case 'max':
-                # agg1 = v1.segment(reduce='max')
-                # agg2 = v2.segment(reduce='max')
-                agg1 = scatter(v1.data, v1.batch, reduce='max')
-                agg2 = scatter(v2.data, v2.batch, reduce='max')
+                agg1 = v1.segment(reduce='max')
+                agg2 = v2.segment(reduce='max')
+                # agg1 = scatter(v1.data, v1.batch, reduce='max')
+                # agg1 = global_max_pool(v1.data, v1.batch)
+
+                # agg2 = scatter(v2.data, v2.batch, reduce='max')
+                # agg2 = global_max_pool(v2.data, v2.batch)
             case other: 
                 agg1 = v1.mean()
                 agg2 = v2.mean()
