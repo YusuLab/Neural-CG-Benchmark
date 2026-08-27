@@ -49,6 +49,32 @@ You may need the Computational Geometry Algorithms Library (CGAL) in order to us
 
    With these two steps, I was able to install and use CGAL with C++17 on a linux-aarch64 machines. Eventually, I would like to move away from using these swig bindings. 
 
+Installation for aarch64 Linux machines
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Installing the necessary dependencies is different for aarch64 linux machines. This is because torch_scatter needs to be built from source. As of now (mid-2026), there are no pre-built official wheels for torch_scatter. 
+
+Instead of using uv, on aarch64 machines, I have had more luck using a conda environment. A such, please start by creating a conda environment with the provided `environment.yml`. Note that these steps worked on the Vista system on the TACC cluster. If you have the chance to use an x86_64 system, I would recommend using that instead. 
+
+.. code-block:: console
+
+   $ conda env create -f environment.yml
+
+This environment does not contain the necessary dependencies for torch_scatter, torch_geometric, torch_heterogeneous_batching, and lightning. 
+
+For torch_scatter, use the guide (here)[https://github.com/rusty1s/pytorch_scatter/issues/428].
+
+For torch_geometric: 
+
+.. code-block:: console 
+
+   $ pip install torch_geometric
+
+For torch_heterogeneous_batching: 
+
+.. code-block:: console 
+   $ pip install "torch_heterogeneous_batching + git+https://github.com/chens5/pytorch_heterogeneous_batching.git@main"
+
 Docker image for TACC
 ~~~~~~~~~~~~~~~~~~~~~
 

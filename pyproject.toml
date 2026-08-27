@@ -1,7 +1,7 @@
 [project]
 name = "nugets"
 version = "0.1.0"
-description = "NeUral GEomeTry Suite — benchmarking neural networks on geometric tasks"
+description = "NeUral GEomeTry — benchmarking neural networks on geometric tasks"
 readme = "README.rst"
 requires-python = ">=3.11,<3.12"
 

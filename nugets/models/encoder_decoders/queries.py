@@ -78,7 +78,7 @@ class ApproximateQueryEncoderDecoder(EncoderDecoder):
     
     def compute_loss(self, batch:QueryBatch, backbone_result: QueryBackboneResult, encoder_info):  
         logits = self.decode(backbone_result)
-        return self.loss_function(input=logits, target=batch.label.float(), reduction="mean") # TODO: make sure only binary cross entropy works here. 
+        return self.loss_function(input=logits, target=batch.label.float(), reduction="mean") 
 
 
 class SetToPointRegressionEncoderDecoder(QueryEncoderDecoder):

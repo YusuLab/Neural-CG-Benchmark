@@ -30,6 +30,7 @@ import lightning as pl
 import torch
 from torch import nn
 from torch_geometric.utils import scatter
+from torch_geometric.nn.pool import global_max_pool
 
 from nugets.pipeline.configs import Config, ModelConf, TaskConf, BackboneConf
 
@@ -128,8 +129,9 @@ class EncoderDecoderToVector(EncoderDecoder):
             case "sum":
                 result = backbone_result.sum()
             case "max":
-                # result = backbone_result.segment(reduce='max')
-                result = scatter(backbone_result.data, backbone_result.batch, reduce='max')
+                result = backbone_result.segment(reduce='max')
+                # result = scatter(backbone_result.data, backbone_result.batch, reduce='max')
+                # result = global_max_pool(backbone_result.data, backbone_result.batch)
             case other:
                 result = backbone_result.mean()
             
