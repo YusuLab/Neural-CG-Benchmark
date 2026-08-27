@@ -5,7 +5,13 @@ NUGETS — NeUral GEomeTry Suite
 About
 =====
 
-This is a machine learning benchmark for geometric problems. 
+This is a machine learning benchmark for geometric problems.
+
+Chores
+=======
+1. Dependency clean-up and streamline installation
+2. Add relative positional encodings
+3. Add in graph learning utilities
 
 
 Install
