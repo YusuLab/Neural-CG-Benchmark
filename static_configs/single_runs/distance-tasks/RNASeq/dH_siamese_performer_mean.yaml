@@ -1,13 +1,13 @@
 task:
-  type: WassersteinDistanceTask
-  dataset: SQUIDBoundaries
+  type: HausdorffDistanceTask
+  dataset: RNASeqPointCloud
   dataset_config:
     length: 100
-    normalization: true
-  ood_dataset: SQUIDBoundaries
+    size: 100
+  ood_dataset: RNASeqPointCloud
   ood_config:
     length: 10
-    normalization: true
+    size: 200
 backbone:
   type: CoupledNetwork
   latent_dimension: 32

@@ -1,13 +1,19 @@
 task:
-  type: WassersteinDistanceTask
-  dataset: SQUIDBoundaries
+  type: HausdorffDistanceTask
+  dataset: GaussianBlobs
   dataset_config:
     length: 100
-    normalization: true
-  ood_dataset: SQUIDBoundaries
+    dim: 2
+    min_points: 50
+    max_points: 100
+    centers: 4
+  ood_dataset: GaussianBlobs
   ood_config:
     length: 10
-    normalization: true
+    dim: 2
+    min_points: 150
+    max_points: 200
+    centers: 4
 backbone:
   type: CoupledNetwork
   latent_dimension: 32

@@ -1,13 +1,11 @@
 task:
   type: WassersteinDistanceTask
-  dataset: SQUIDBoundaries
+  dataset: NZDEM
   dataset_config:
-    length: 100
-    normalization: true
-  ood_dataset: SQUIDBoundaries
+    n_points: 100
+  ood_dataset: NZDEM
   ood_config:
-    length: 10
-    normalization: true
+    n_points: 200
 backbone:
   type: CoupledNetwork
   latent_dimension: 32
@@ -15,7 +13,7 @@ backbone:
   reconstruct_input: false
   decoder_distance: SinkhornLoss
   use_siamese: true
-  aggregation: mean
+  aggregation: sum
   encoder:
     type: Performer
     n_heads: 2

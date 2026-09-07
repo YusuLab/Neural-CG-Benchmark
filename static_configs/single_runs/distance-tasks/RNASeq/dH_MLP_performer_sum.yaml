@@ -1,21 +1,21 @@
 task:
-  type: WassersteinDistanceTask
-  dataset: SQUIDBoundaries
+  type: HausdorffDistanceTask
+  dataset: RNASeqPointCloud
   dataset_config:
     length: 100
-    normalization: true
-  ood_dataset: SQUIDBoundaries
+    size: 100
+  ood_dataset: RNASeqPointCloud
   ood_config:
     length: 10
-    normalization: true
+    size: 200
 backbone:
   type: CoupledNetwork
   latent_dimension: 32
   p: 1
   reconstruct_input: false
   decoder_distance: SinkhornLoss
-  use_siamese: true
-  aggregation: mean
+  use_siamese: false
+  aggregation: sum
   encoder:
     type: Performer
     n_heads: 2
