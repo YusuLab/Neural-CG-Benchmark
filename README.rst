@@ -123,16 +123,15 @@ Run
 ====
 This project relies heavily on wandb for tracking metrics as well as hyperparameter searching. As such, make a `config.yaml` file which contains your wandb API key and the name of the wandb_project which you would like to log to. Format it as follow:
 
-```
+.. code-block:: yaml
 wandb_key: <your-api-key>
 wandb_project: <NUGETS>
-```
 
 
 In order to run a single configuration, simply run the following command:
 
 .. code-block:: console 
-   $ python -m nugets train_from_config <your-experiment-config> --n-epochs <number-of-training-epochs>
+   $ python -m nugets train_from_config experiment-config.yaml --n-epochs 100
 
 There are several experiment configurations available under `static_configs/single_runs`.
 
