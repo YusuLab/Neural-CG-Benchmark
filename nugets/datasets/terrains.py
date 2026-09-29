@@ -30,11 +30,12 @@ class NZDEM(Dataset[Set_datapoint]):
     sampling: str = "random" # This is an additional parameter that can change
     split_seed: int = 42 # split for test/train split
     total_n_points: int = 1000
-    def __init__(self, n_points: int = 100, seed=42, which="train", **kwargs):
+    def __init__(self,length:int = 100, n_points: int = 100, seed=42, which="train",meters=False, **kwargs):
         super().__init__(**kwargs)
         self.dim = 3  # dimension of NZDem file. 
         self.n_points = n_points
         self.seed = seed
+        self.length = length
         # Locations for all relevant parts of the dataset
         root_dir = Path("workdir/datasets/raw/nz_dem")
         if not root_dir.exists():
@@ -63,17 +64,19 @@ class NZDEM(Dataset[Set_datapoint]):
             which = "val"
         is_train_or_val = which in ("train", "val") 
         num_sample = n_points
+        rng = np.random.default_rng(self.seed)
 
         indices = np.array([
-            np.random.choice(self.total_n_points, num_sample, replace=False, seed=self.seed)
+            rng.choice(self.total_n_points, num_sample, replace=False)
             for _ in range(len(raw_inner))
         ])
 
         inner = np.take_along_axis(raw_inner, indices[:, :, None], axis=1)
-        rng = np.random.default_rng(self.seed)
-        train_split_num = int(0.9 * len(raw_inner))
-        train_split = rng.integers(0, high=len(raw_inner), size= train_split_num, replace=False)
-        test_split = [idx for idx in range(len(raw_inner)) if idx not in train_split]
+        train_split_num = length
+        test_split_num = int(length/0.9)
+        train_test_sample = rng.choice(len(raw_inner), size=train_split_num+test_split_num, replace=False)
+        train_split = train_test_sample[:length]
+        test_split = train_test_sample[length:]
         if which == "train":    
             inner = inner[train_split]
         else:
@@ -82,9 +85,10 @@ class NZDEM(Dataset[Set_datapoint]):
             #         which=which, seed=self.split_seed,
             #         splits=["train", "val"], percents=[.9, .1])
             # inner = split_transform(inner)
-        inner = inner - inner.mean(dim=0, keepdim=True) # center dataset
+        inner = inner - inner.mean(axis=0, keepdims=True) # center dataset
         self.inner = torch.tensor(inner, dtype=torch.float32)
-        
+        if not meters:
+            self.inner = self.inner/1000
 
     def prepare(self, tif_file_path):
         """
@@ -147,4 +151,4 @@ class NZDEM(Dataset[Set_datapoint]):
         return dataset, labels
     
     def dataset_parameters(self):
-        return {'dim': self.dim, 'n_points': self.n_points}
+        return {'length': self.length, 'dim': self.dim, 'n_points': self.n_points}

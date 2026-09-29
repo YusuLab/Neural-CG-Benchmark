@@ -73,6 +73,7 @@ class DistanceTask(Task):
         """Get the encoder-decoder"""
         from nugets.models.encoder_decoders.distances import DistanceEncoderDecoder
         dataset_info = self.dataset_info()
+        #print(self.dataset_parameters)
         backbone_input_dims = backbone.get_input_dim()
         backbone_output_dim = backbone.get_output_dim()
         if "dim1" in dataset_info:
