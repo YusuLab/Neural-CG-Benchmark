@@ -62,9 +62,11 @@ class RNASeqPointCloud(Dataset[Set_datapoint]):
         self.size = size
 
         selected_indices = rng.choice(len(raw_data), size = (self.length, self.size))
-        self.inner = raw_data[selected_indices]
+        
         self.size = size
         self.dimension = raw_data.shape[1]
+        self.inner = raw_data[selected_indices]
+        self.inner = torch.tensor(self.inner, dtype=torch.float32)
 
     def __len__(self):
         return len(self.inner)

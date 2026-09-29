@@ -27,7 +27,7 @@ class SQUIDBoundaries(Dataset[Set_datapoint]):
         # Retrieve from data folder
         inner = np.load('nugets/datasets/data/squid-data.npy')
         if normalization:
-            inner = inner - np.expand_dims(np.mean(inner, axis=0), 0) # center dataset
+            inner = inner - np.expand_dims(np.mean(inner, axis=1), 1) # center dataset
             mins = inner.min(axis=1, keepdims=True)      
             maxs = inner.max(axis=1, keepdims=True)     
             sizes = maxs - mins                         

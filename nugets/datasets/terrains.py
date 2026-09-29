@@ -73,7 +73,7 @@ class NZDEM(Dataset[Set_datapoint]):
 
         inner = np.take_along_axis(raw_inner, indices[:, :, None], axis=1)
         train_split_num = length
-        test_split_num = int(length/0.9)
+        test_split_num = int(length/0.9)  - length
         train_test_sample = rng.choice(len(raw_inner), size=train_split_num+test_split_num, replace=False)
         train_split = train_test_sample[:length]
         test_split = train_test_sample[length:]
@@ -81,11 +81,7 @@ class NZDEM(Dataset[Set_datapoint]):
             inner = inner[train_split]
         else:
             inner = inner[test_split]
-            # split_transform: SplitTransform = SplitTransform(
-            #         which=which, seed=self.split_seed,
-            #         splits=["train", "val"], percents=[.9, .1])
-            # inner = split_transform(inner)
-        inner = inner - inner.mean(axis=0, keepdims=True) # center dataset
+        inner = inner - inner.mean(axis=1, keepdims=True) # center dataset
         self.inner = torch.tensor(inner, dtype=torch.float32)
         if not meters:
             self.inner = self.inner/1000
@@ -149,6 +145,11 @@ class NZDEM(Dataset[Set_datapoint]):
                 dataset.extend(pointsets)
                 labels.extend(terrain_labels)
         return dataset, labels
-    
+    def __len__(self):
+            return len(self.inner)
+        
+    def __getitem__(self, i):
+        dp = self.inner[i]
+        return Set_datapoint(dp)
     def dataset_parameters(self):
         return {'length': self.length, 'dim': self.dim, 'n_points': self.n_points}
