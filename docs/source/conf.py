@@ -5,7 +5,9 @@
 from sphinx_pyproject import SphinxConfig
 
 import sys
-sys.path.append("..")
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 # -- Project information -----------------------------------------------------
 # we are using the pyproject.toml file to store the project metadata

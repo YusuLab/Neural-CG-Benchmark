@@ -6,6 +6,7 @@ The NUGETs package is meant to allow people to easily run their own models to in
 Workflow
 -----------------
 The NUGETs package is separated out into three major parts: 
+
 #. Datasets: this is the raw point cloud data.
 #. Task: maps each dataset to a label, depending on the problem you are interested in. 
 #. Model: model which is used to approximate solutions. We follow the Encode-Process-Decode paradigm of (Hamrick). 
