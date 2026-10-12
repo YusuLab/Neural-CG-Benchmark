@@ -17,6 +17,9 @@ Methodology:
         performance of neural networks on geometry tasks.
 
     3. Metrics:
+        We also provide various choices for metrics one can track during training e.g.
+        mean squared error, relative error, more specialised error metrics that are task specific.
+        These can be found in the losses. 
 
 
 """
