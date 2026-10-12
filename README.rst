@@ -4,7 +4,7 @@ NUGETS — NeUral GEomeTry Suite
 About
 -----
 
-This is a machine learning benchmark for geometric problems. Documentation can be found [here](https://yusulab.github.io/Neural-CG-Benchmark/index.html)
+This is a machine learning benchmark for geometric problems. Documentation can be found `here <https://yusulab.github.io/Neural-CG-Benchmark/index.html>`_.
 
 Install
 -------
