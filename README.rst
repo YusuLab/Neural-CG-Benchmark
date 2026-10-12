@@ -6,19 +6,6 @@ About
 
 This is a machine learning benchmark for geometric problems.
 
-Chores (ordered from most to least urgent)
------------------------------------------
-
-1. Update documentation
-
-   A. Executing single runs and hyperparameter searches.
-   B. Installing CGAL from a personal SWIG fork.
-
-2. Add in graph learning utilities
-3. Add relative positional encodings
-4. Clean CGAL dependencies (eventually, I would like to move away from CGAL entirely.)
-5. Add in more sophisticated sampling options (Morse-based sampling on NZDEM dataset.)
-
 Install
 -------
 
@@ -147,3 +134,17 @@ In order to run a single configuration, simply run the following command:
 There are several experiment configurations available under ``static_configs/single_runs``.
 
 More information regarding running the code and the structure of this repository can be found in the documentation.
+
+
+Chores (ordered from most to least urgent)
+-----------------------------------------
+
+1. Update documentation
+
+   A. Executing single runs and hyperparameter searches.
+   B. Installing CGAL from a personal SWIG fork.
+
+2. Add in graph learning utilities
+3. Add relative positional encodings
+4. Clean CGAL dependencies (eventually, I would like to move away from CGAL entirely.)
+5. Add in more sophisticated sampling options (Morse-based sampling on NZDEM dataset.)
