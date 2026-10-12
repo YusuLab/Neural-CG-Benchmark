@@ -101,31 +101,94 @@ class AlphaShape2MembershipTask(SetMembershipTask):
     """
     Predict membership in the convex hull. Returns a one-hot encoding corresponding to points in the convex hull. 
     """
-    def label(self, pointset, alpha=5.0):
+    def label(self, pointset, alpha=5.0, use_cgal=False):
         """
         Use CGAL to compute an alpha shape for 2D points
         """
-        from CGAL.CGAL_Kernel import Point_2
-        from CGAL.CGAL_Alpha_shape_2 import Alpha_shape_2
-        from CGAL.CGAL_Alpha_shape_2 import Weighted_alpha_shape_2_Face_handle
-        from CGAL.CGAL_Alpha_shape_2 import GENERAL, EXTERIOR, SINGULAR, REGULAR, INTERIOR
-        from CGAL.CGAL_Alpha_shape_2 import Alpha_shape_2_Vertex_handle
+        if use_cgal:
+            from CGAL.CGAL_Kernel import Point_2
+            from CGAL.CGAL_Alpha_shape_2 import Alpha_shape_2
+            from CGAL.CGAL_Alpha_shape_2 import Weighted_alpha_shape_2_Face_handle
+            from CGAL.CGAL_Alpha_shape_2 import GENERAL, EXTERIOR, SINGULAR, REGULAR, INTERIOR
+            from CGAL.CGAL_Alpha_shape_2 import Alpha_shape_2_Vertex_handle
 
-        # TODO: Add assertion for 2D alpha shape
-        # TODO: Add task parameters to set the alpha in alpha shape
-        cgal_pts = []
-        for pt in pointset:
-            cgal_pts.append(Point_2(pt[0].item(), pt[1].item()))
-        t = Alpha_shape_2(cgal_pts, alpha, GENERAL)
-        t.clear()
-        t.make_alpha_shape(cgal_pts)
-        t.set_alpha(alpha)
-        n_points = len(cgal_pts)
-        in_shape = np.zeros(n_points)
-        for i in range(len(cgal_pts)):
-            v = cgal_pts[i]
-            vert_type = t.classify(v)
-            if vert_type in [SINGULAR, REGULAR]:
-                in_shape[i] = 1.0
-        out = torch.tensor(in_shape).unsqueeze(1)
-        return out.float()
+            # TODO: Add assertion for 2D alpha shape
+            # TODO: Add task parameters to set the alpha in alpha shape
+            cgal_pts = []
+            for pt in pointset:
+                cgal_pts.append(Point_2(pt[0].item(), pt[1].item()))
+            t = Alpha_shape_2(cgal_pts, alpha, GENERAL)
+            t.clear()
+            t.make_alpha_shape(cgal_pts)
+            t.set_alpha(alpha)
+            n_points = len(cgal_pts)
+            in_shape = np.zeros(n_points)
+            for i in range(len(cgal_pts)):
+                v = cgal_pts[i]
+                vert_type = t.classify(v)
+                if vert_type in [SINGULAR, REGULAR]:
+                    in_shape[i] = 1.0
+            out = torch.tensor(in_shape).unsqueeze(1)
+            return out.float()
+        else:
+            edges, mask = alpha_shape_2d(pointset, alpha=alpha)
+            mask = np.array(mask, dtype=np.float32)
+            out = torch.tensor(mask).unsqueeze(1)
+            return out.float()
+
+
+
+def alpha_shape_2d(points, alpha=5.0):
+    from math import isfinite, sqrt
+    
+    """
+    Return (boundary_segments, boundary_mask), using squared-radius alpha.
+
+    Python only implementation of AlphaShapes. O(n^3) time; suitable for small point clouds.
+    """
+    original = [tuple(map(float, p)) for p in points]
+    alpha = float(alpha)
+    
+    if not isfinite(alpha) or alpha < 0:
+        raise ValueError("alpha must be finite and nonnegative")
+    if any(len(p) != 2 or not all(map(isfinite, p)) for p in original):
+        raise ValueError("Expected finite 2D points")
+
+    points = list(dict.fromkeys(original))  # Handle duplicate coordinates.
+    edges = []
+    connected = set()
+    boundary = set()
+    tolerance = 1e-12 * alpha
+
+    for i, (ax, ay) in enumerate(points):
+        for j in range(i + 1, len(points)):
+            bx, by = points[j]
+            dx, dy = bx - ax, by - ay
+            distance_sq = dx * dx + dy * dy
+
+            if distance_sq > 4 * alpha:
+                continue
+
+            connected.update((i, j))
+            mx, my = ax + dx / 2, ay + dy / 2
+            offset = sqrt(max(0.0, alpha / distance_sq - 0.25))
+
+            # Two possible centers for a radius-sqrt(alpha) circle.
+            for sign in (-1, 1):
+                cx = mx - sign * dy * offset
+                cy = my + sign * dx * offset
+                empty = all(
+                    (x - cx) ** 2 + (y - cy) ** 2 >= alpha - tolerance
+                    for k, (x, y) in enumerate(points)
+                    if k != i and k != j
+                )
+                if empty:
+                    edges.append((points[i], points[j]))
+                    boundary.update((i, j))
+                    break
+
+    # A point is isolated when no other point is within 2*sqrt(alpha).
+    boundary.update(set(range(len(points))) - connected)
+    boundary_points = {points[i] for i in boundary}
+    mask = [p in boundary_points for p in original]
+    return edges, mask

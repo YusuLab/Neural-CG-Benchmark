@@ -25,14 +25,23 @@ def minimum_ball_error(c, predicted_c, r, predicted_r, p=2, **kwargs):
     return err 
 
 def minimum_ball_radius_error(r, predicted_r, **kwargs):
+    """
+    Returns the difference between the predicted radius and the real radius. 
+    """
     err = mse_loss(r, predicted_r)
     return err
 
 def minimum_annulus_error(c, predicted_c, inner_r, predicted_inner_r, outer_r, predicted_outer_r, **kwargs):
+    """
+    Returns the sum of Euclidean distance between the predicted and the real center of the minimum enclosing annulus and the differences between the predicted and real inner/outer radii. 
+    """
     err = torch.mean(torch.linalg.norm(c - predicted_c, axis=1)) + minimum_annulus_radius_error(inner_r, predicted_inner_r, outer_r, predicted_outer_r)
     return err
 
 def minimum_annulus_radius_error(inner_r, predicted_inner_r, outer_r, predicted_outer_r, **kwargs):
+    """
+    Returns the sum of the differences between the predicted and real inner/outer radii. 
+    """
     inner_r_err = mse_loss(inner_r, predicted_inner_r)
     outer_r_err = mse_loss(outer_r, predicted_outer_r)
     return inner_r_err + outer_r_err
@@ -68,6 +77,7 @@ def binary_focal_loss(input, target, gamma=5, reduction=None, **kwargs):
         return loss.mean()
 
 def scatter_binary_focal_loss(predicted, target, index, reduction='mean', **kwargs):
+    """ Batch compatible focal loss for binary classification. """
     unrolled = binary_focal_loss(input=predicted, target=target)
     per_set_fl_error = scatter(src=unrolled, index=index, reduce=reduction)
     return per_set_fl_error.mean()

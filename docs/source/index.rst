@@ -11,6 +11,7 @@
 
    self
    running
+   reference
    cloud_integration
 
 
